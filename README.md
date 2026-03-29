@@ -1,7 +1,7 @@
 ---
 title: Mozaicteck Rag
 emoji: 🤖
-colorFrom: orange
+colorFrom: red
 colorTo: yellow
 sdk: docker
 pinned: false
