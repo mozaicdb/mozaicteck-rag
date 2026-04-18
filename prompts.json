@@ -1,0 +1,1734 @@
+{
+  "version": "1.0",
+  "total_prompts": 120,
+  "categories": [
+    {
+      "id": "business_owners",
+      "label": "Business Owners",
+      "prompts": [
+        {
+          "id": "bo_001",
+          "title": "Write a Business Plan Executive Summary",
+          "description": "Generate a clear and professional executive summary for a business plan.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is your business name and what does it do?",
+            "Who is your target customer?",
+            "What problem does your business solve?",
+            "What makes your business different from competitors?",
+            "What are your main revenue streams?"
+          ]
+        },
+        {
+          "id": "bo_002",
+          "title": "Create a Social Media Content Calendar",
+          "description": "Plan a month of social media posts tailored to your business goals.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What platforms are you posting on?",
+            "What is your business niche?",
+            "How many posts per week do you want?",
+            "What are your content goals (sales, awareness, engagement)?",
+            "Do you have any upcoming promotions or events?"
+          ]
+        },
+        {
+          "id": "bo_003",
+          "title": "Draft a Professional Business Email",
+          "description": "Write a polished email for client communication, proposals, or follow-ups.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "Who are you emailing and what is their role?",
+            "What is the main purpose of this email?",
+            "What tone do you want (formal, friendly, urgent)?",
+            "What action do you want the reader to take?",
+            "Any key details or context to include?"
+          ]
+        },
+        {
+          "id": "bo_004",
+          "title": "Write a Product or Service Description",
+          "description": "Create a compelling description that highlights value and drives sales.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the product or service name?",
+            "What does it do and who is it for?",
+            "What are its top 3 benefits?",
+            "What problem does it solve for the customer?",
+            "What is the price range or offer?"
+          ]
+        },
+        {
+          "id": "bo_005",
+          "title": "Generate Customer FAQ Responses",
+          "description": "Build clear and helpful FAQ answers for your business website or support team.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is your business type?",
+            "What are the top 5 questions your customers ask?",
+            "What tone should the answers use?",
+            "Are there policies or guarantees to mention?",
+            "How long should each answer be?"
+          ]
+        },
+        {
+          "id": "bo_006",
+          "title": "Create a Customer Onboarding Message",
+          "description": "Write a warm, clear welcome message for new customers or clients.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What product or service did the customer just purchase?",
+            "What should the customer do first after joining?",
+            "What resources or links do you want to share?",
+            "What tone fits your brand (warm, professional, casual)?",
+            "Is there a support contact or community to mention?"
+          ]
+        },
+        {
+          "id": "bo_007",
+          "title": "Write a Sales Script for Phone or DM Outreach",
+          "description": "Create a natural and persuasive script for reaching out to potential clients.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "Who are you reaching out to and why?",
+            "What product or service are you pitching?",
+            "What pain point does it solve for them?",
+            "What is your ask or call to action?",
+            "What objections might they raise?"
+          ]
+        },
+        {
+          "id": "bo_008",
+          "title": "Draft a Business Partnership Proposal",
+          "description": "Write a professional proposal to approach a potential business partner or collaborator.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "Who are you proposing the partnership to?",
+            "What type of partnership are you proposing?",
+            "What value does each party bring?",
+            "What are the expected outcomes?",
+            "What is the next step you are proposing?"
+          ]
+        },
+        {
+          "id": "bo_009",
+          "title": "Create a Weekly Business Performance Report",
+          "description": "Summarize your business results, wins, and areas to improve in a clear format.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What metrics do you track weekly (sales, leads, revenue, etc.)?",
+            "What were the results this week?",
+            "What went well?",
+            "What did not go as planned?",
+            "What is the priority focus for next week?"
+          ]
+        },
+        {
+          "id": "bo_010",
+          "title": "Write a Refund or Complaint Response",
+          "description": "Handle difficult customer situations with a calm and professional reply.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What was the customer's complaint or request?",
+            "What is your refund or resolution policy?",
+            "Do you want to offer a replacement, refund, or apology?",
+            "What tone do you want (empathetic, firm, solution-focused)?",
+            "Is there anything to avoid saying?"
+          ]
+        },
+        {
+          "id": "bo_011",
+          "title": "Build a Competitive Analysis Summary",
+          "description": "Compare your business to 2 to 3 competitors and identify your advantages.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your business and what do you offer?",
+            "Who are your 2 to 3 main competitors?",
+            "What do they do well?",
+            "Where do they fall short?",
+            "What is your unique competitive advantage?"
+          ]
+        },
+        {
+          "id": "bo_012",
+          "title": "Write a Launch Announcement Post",
+          "description": "Create a compelling post to announce a new product, service, or business milestone.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What are you launching?",
+            "What makes it valuable to your audience?",
+            "What platform is this for (LinkedIn, Instagram, email, etc.)?",
+            "Is there an offer, discount, or deadline attached?",
+            "What action should readers take after reading?"
+          ]
+        },
+        {
+          "id": "bo_013",
+          "title": "Create a 90-Day Business Growth Plan",
+          "description": "Build a focused action plan to grow your business over the next 3 months.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your main business goal for the next 90 days?",
+            "What are your current biggest bottlenecks?",
+            "What resources do you have (budget, team, tools)?",
+            "What strategies do you want to focus on (marketing, sales, operations)?",
+            "How will you measure success at the end of 90 days?"
+          ]
+        },
+        {
+          "id": "bo_014",
+          "title": "Write a Pricing Justification Message",
+          "description": "Explain your pricing confidently to customers who push back or question your rates.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your product or service and its price?",
+            "What key value does it deliver to the client?",
+            "What objection are you responding to?",
+            "What makes your offer worth the price?",
+            "What tone should this message use?"
+          ]
+        },
+        {
+          "id": "bo_015",
+          "title": "Create a Business SWOT Analysis",
+          "description": "Identify your strengths, weaknesses, opportunities, and threats in a structured format.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What type of business do you run?",
+            "What do you consider your biggest strengths right now?",
+            "What are your current weaknesses or gaps?",
+            "What opportunities do you see in your market?",
+            "What external threats or risks concern you?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "students",
+      "label": "Students",
+      "prompts": [
+        {
+          "id": "st_001",
+          "title": "Summarize a Long Article or Textbook Chapter",
+          "description": "Get a clear, concise summary of any long piece of academic content.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What subject is this content from?",
+            "What is the main topic or chapter title?",
+            "Paste the text or describe its key sections.",
+            "How long should the summary be?",
+            "Do you need key terms or definitions highlighted?"
+          ]
+        },
+        {
+          "id": "st_002",
+          "title": "Explain a Difficult Concept in Simple Terms",
+          "description": "Break down a complex topic so it is easy to understand.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What concept do you want explained?",
+            "What subject or course is it from?",
+            "What do you already understand about it?",
+            "What part is confusing you most?",
+            "Do you want an analogy or real-life example?"
+          ]
+        },
+        {
+          "id": "st_003",
+          "title": "Create a Study Schedule",
+          "description": "Build a realistic study plan based on your exams, deadlines, and available time.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What subjects or courses do you need to study?",
+            "When are your exams or deadlines?",
+            "How many hours per day can you study?",
+            "What time of day do you study best?",
+            "Do you prefer one subject per day or mixed sessions?"
+          ]
+        },
+        {
+          "id": "st_004",
+          "title": "Write a Strong Essay Introduction",
+          "description": "Generate a compelling opening paragraph for any academic essay.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is your essay topic?",
+            "What is your main argument or thesis?",
+            "What subject or course is this for?",
+            "What academic level is this (high school, undergraduate, postgraduate)?",
+            "Should it start with a hook, question, or fact?"
+          ]
+        },
+        {
+          "id": "st_005",
+          "title": "Generate Practice Questions for an Exam",
+          "description": "Create realistic practice questions to test your understanding before an exam.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What subject and topic are you preparing for?",
+            "What type of questions do you need (multiple choice, essay, short answer)?",
+            "How many questions do you want?",
+            "What difficulty level (easy, medium, hard)?",
+            "Should answers be included?"
+          ]
+        },
+        {
+          "id": "st_006",
+          "title": "Proofread and Improve an Essay or Assignment",
+          "description": "Get feedback on grammar, structure, clarity, and academic tone.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the essay topic or assignment question?",
+            "What academic level and subject is this?",
+            "Paste your essay or a section of it.",
+            "What specific areas do you want feedback on?",
+            "Should the tone be kept formal or academic?"
+          ]
+        },
+        {
+          "id": "st_007",
+          "title": "Create Flashcards for a Topic",
+          "description": "Turn your notes or a topic into ready-to-use flashcard pairs.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What topic or subject are the flashcards for?",
+            "How many flashcards do you need?",
+            "Should they be term-and-definition or question-and-answer format?",
+            "What level of detail is needed?",
+            "Any specific subtopics to focus on?"
+          ]
+        },
+        {
+          "id": "st_008",
+          "title": "Write a Research Paper Outline",
+          "description": "Build a structured outline for a research paper on any topic.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your research topic?",
+            "What is your research question or thesis?",
+            "How long is the paper (pages or word count)?",
+            "What sections are required (introduction, literature review, methodology, etc.)?",
+            "What citation style do you use (APA, MLA, Harvard)?"
+          ]
+        },
+        {
+          "id": "st_009",
+          "title": "Understand and Solve a Math Problem Step by Step",
+          "description": "Get a clear walkthrough of how to solve a math problem with explanations.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the math topic (algebra, calculus, statistics, etc.)?",
+            "Type or describe the problem you need help with.",
+            "What step are you stuck on?",
+            "Do you want the formula explained before the solution?",
+            "Should the answer be shown at the end or revealed step by step?"
+          ]
+        },
+        {
+          "id": "st_010",
+          "title": "Prepare for a Class Presentation or Defence",
+          "description": "Get help structuring your presentation and anticipating questions.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your presentation topic?",
+            "How long is the presentation?",
+            "Who is your audience (classmates, lecturers, panel)?",
+            "What key points must you cover?",
+            "What questions might you be asked?"
+          ]
+        },
+        {
+          "id": "st_011",
+          "title": "Write a Cover Letter for an Internship",
+          "description": "Craft a professional cover letter for a student internship application.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What internship role are you applying for?",
+            "What company or organisation is it with?",
+            "What are your key academic or extracurricular strengths?",
+            "Why do you want this specific internship?",
+            "What skills or experience make you a good fit?"
+          ]
+        },
+        {
+          "id": "st_012",
+          "title": "Analyse a Case Study",
+          "description": "Break down a case study and produce a structured academic analysis.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What subject or course is this case study for?",
+            "Briefly describe the case or paste key details.",
+            "What specific questions must your analysis answer?",
+            "What frameworks should you apply (SWOT, PESTLE, Porter's Five Forces, etc.)?",
+            "How long should the analysis be?"
+          ]
+        },
+        {
+          "id": "st_013",
+          "title": "Build a Personal Study Note System",
+          "description": "Design a note-taking structure that fits your learning style and subject load.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "How many subjects are you currently taking?",
+            "What note-taking methods have you tried before?",
+            "Do you prefer digital or paper notes?",
+            "What is your biggest struggle with note-taking?",
+            "When do you usually review your notes?"
+          ]
+        },
+        {
+          "id": "st_014",
+          "title": "Write a Literature Review Section",
+          "description": "Synthesise academic sources into a well-structured literature review.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What is your research topic or thesis?",
+            "List the key sources or authors you are reviewing.",
+            "What themes or arguments are you comparing?",
+            "How many words is this section?",
+            "What citation style is required?"
+          ]
+        },
+        {
+          "id": "st_015",
+          "title": "Turn Lecture Notes into a Full Study Guide",
+          "description": "Convert raw lecture notes into an organised, easy-to-revise study guide.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What subject and topic do these notes cover?",
+            "Paste your raw notes or describe the key points.",
+            "Should key terms be defined separately?",
+            "Do you want diagrams or tables suggested?",
+            "How long should the study guide be?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content_creators",
+      "label": "Content Creators",
+      "prompts": [
+        {
+          "id": "cc_001",
+          "title": "Write an Instagram Caption with Hashtags",
+          "description": "Create an engaging caption for any Instagram post with relevant hashtags.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the post about?",
+            "What is the mood or tone (motivational, funny, informative, personal)?",
+            "Who is your target audience?",
+            "Should it include a call to action?",
+            "How many hashtags do you want and what niche are they for?"
+          ]
+        },
+        {
+          "id": "cc_002",
+          "title": "Write a Twitter or X Thread",
+          "description": "Turn an idea or topic into a compelling multi-tweet thread that holds attention.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the main topic or lesson for the thread?",
+            "How many tweets do you want in the thread?",
+            "What is the hook or opening tweet?",
+            "What key points should each tweet cover?",
+            "How should the thread end (call to action, summary, question)?"
+          ]
+        },
+        {
+          "id": "cc_003",
+          "title": "Write a LinkedIn Post",
+          "description": "Craft a professional LinkedIn post that builds your personal brand and gets engagement.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What topic or story do you want to share?",
+            "What is the main takeaway or lesson?",
+            "What is your professional niche or industry?",
+            "Should it include a personal experience or data point?",
+            "What do you want readers to do after reading?"
+          ]
+        },
+        {
+          "id": "cc_004",
+          "title": "Write a TikTok Video Script",
+          "description": "Create a short, punchy script for a TikTok video that grabs attention fast.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the video topic or idea?",
+            "How long is the video (15, 30, or 60 seconds)?",
+            "What is the hook in the first 3 seconds?",
+            "What tone do you want (funny, educational, inspirational)?",
+            "Should there be a call to action at the end?"
+          ]
+        },
+        {
+          "id": "cc_005",
+          "title": "Write Replies to Comments or DMs",
+          "description": "Generate friendly, on-brand responses to audience comments and messages.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What platform are the comments on?",
+            "What is the general type of comment (question, compliment, criticism)?",
+            "What is your content niche?",
+            "What tone matches your brand (casual, professional, witty)?",
+            "Paste 1 to 3 sample comments you want to respond to."
+          ]
+        },
+        {
+          "id": "cc_006",
+          "title": "Write a Blog Post Outline",
+          "description": "Structure a clear, SEO-friendly blog post outline on any topic.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the blog post topic?",
+            "Who is your target reader?",
+            "How long should the post be (word count)?",
+            "What main sections should be covered?",
+            "Should it include an intro, FAQs, and a conclusion?"
+          ]
+        },
+        {
+          "id": "cc_007",
+          "title": "Write a YouTube Video Script",
+          "description": "Create a full script for a YouTube video including intro, body, and outro.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the video topic?",
+            "How long should the video be (minutes)?",
+            "Who is the target audience?",
+            "What key points or sections should the script cover?",
+            "Should it include a subscribe reminder or sponsor section?"
+          ]
+        },
+        {
+          "id": "cc_008",
+          "title": "Write a Newsletter Edition",
+          "description": "Create a complete newsletter issue for your subscribers.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the newsletter niche or theme?",
+            "What is this edition about?",
+            "What sections does your newsletter usually include?",
+            "What tone do you use with your audience?",
+            "Is there a product, link, or offer to mention?"
+          ]
+        },
+        {
+          "id": "cc_009",
+          "title": "Write a Long-Form Blog Article",
+          "description": "Create a full, detailed blog article optimised for readers and search engines.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the article topic and target keyword?",
+            "Who is the reader and what do they need to know?",
+            "What is the word count target?",
+            "What structure should it follow?",
+            "Should it include examples, stats, or expert quotes?"
+          ]
+        },
+        {
+          "id": "cc_010",
+          "title": "Create 10 Viral Hook Ideas",
+          "description": "Generate strong opening lines for posts, videos, or articles that stop the scroll.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What topic or niche are the hooks for?",
+            "What platform are they for (Instagram, TikTok, Twitter, blog)?",
+            "What emotion should the hook trigger (curiosity, surprise, urgency, fear)?",
+            "Who is your target audience?",
+            "Should they be questions, statements, or bold claims?"
+          ]
+        },
+        {
+          "id": "cc_011",
+          "title": "Repurpose One Piece of Content into Multiple Formats",
+          "description": "Turn a blog post, video, or article into content for multiple platforms.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the original content (paste or describe it)?",
+            "What formats do you want it repurposed into?",
+            "Which platforms will each format be posted on?",
+            "Should the tone stay the same or adapt per platform?",
+            "Are there specific highlights or quotes to prioritise?"
+          ]
+        },
+        {
+          "id": "cc_012",
+          "title": "Build a 30-Day Content Calendar",
+          "description": "Plan a full month of content ideas across your key platforms.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What platforms are you posting on?",
+            "What is your niche or content focus?",
+            "How many times per week do you post on each platform?",
+            "Do you have any campaigns, launches, or events this month?",
+            "What content pillars or themes do you rotate through?"
+          ]
+        },
+        {
+          "id": "cc_013",
+          "title": "Write Stronger Call-to-Action Lines",
+          "description": "Craft compelling CTAs that push your audience to click, follow, buy, or share.",
+          "tier": "premium",
+          "difficulty": "beginner",
+          "stages": [
+            "What action do you want your audience to take?",
+            "What platform or content type is this for?",
+            "What is your niche or offer?",
+            "Should the CTA feel urgent, soft, or conversational?",
+            "How many CTA options do you want?"
+          ]
+        },
+        {
+          "id": "cc_014",
+          "title": "Grow Your Audience Strategy Plan",
+          "description": "Build a practical strategy to grow followers and reach on your chosen platform.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What platform are you trying to grow on?",
+            "What is your current follower count and niche?",
+            "What content formats are you currently using?",
+            "What has worked or failed so far?",
+            "What is your growth goal in the next 90 days?"
+          ]
+        },
+        {
+          "id": "cc_015",
+          "title": "Analyse Content Performance and Suggest Improvements",
+          "description": "Review your content results and get specific actions to improve performance.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What platform and content type are you reviewing?",
+            "What were your top-performing and worst-performing posts?",
+            "What metrics matter most to you (reach, likes, saves, clicks)?",
+            "What patterns do you notice in the data?",
+            "What content goals are you not hitting yet?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "marketers_copywriters",
+      "label": "Marketers and Copywriters",
+      "prompts": [
+        {
+          "id": "mc_001",
+          "title": "Write a Facebook or Instagram Ad",
+          "description": "Create a scroll-stopping ad copy with headline, body, and call to action.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What product or service are you advertising?",
+            "Who is the target audience?",
+            "What is the main benefit or hook?",
+            "What action should the ad drive (buy, sign up, learn more)?",
+            "What is the budget context (cold audience or retargeting)?"
+          ]
+        },
+        {
+          "id": "mc_002",
+          "title": "Write a Google Search Ad",
+          "description": "Generate keyword-focused Google ad copy with headlines and descriptions.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the product or service being advertised?",
+            "What are the top 2 to 3 keywords you are targeting?",
+            "What makes your offer stand out from competitors?",
+            "What is the landing page destination?",
+            "What call to action do you want?"
+          ]
+        },
+        {
+          "id": "mc_003",
+          "title": "Write a Cold Email Campaign Sequence",
+          "description": "Build a 3 to 5 email sequence for cold outreach that generates replies.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "Who are you emailing and what do they do?",
+            "What product or service are you pitching?",
+            "What specific pain point does it address?",
+            "How many emails in the sequence?",
+            "What tone and approach should the sequence use?"
+          ]
+        },
+        {
+          "id": "mc_004",
+          "title": "Map Out a Sales Funnel",
+          "description": "Design a simple funnel from awareness to conversion for any offer.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the product or service you are selling?",
+            "Who is your ideal customer?",
+            "What is the price point?",
+            "What traffic source are you using (ads, organic, email)?",
+            "What conversion action is the funnel built around?"
+          ]
+        },
+        {
+          "id": "mc_005",
+          "title": "Write a Retargeting Ad Script",
+          "description": "Create ad copy aimed at people who have already visited your site or engaged with your content.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What did the audience do (visited site, added to cart, watched video)?",
+            "What is the offer or product?",
+            "What objection likely stopped them from converting?",
+            "What urgency or incentive can you offer?",
+            "Which platform is this retargeting ad for?"
+          ]
+        },
+        {
+          "id": "mc_006",
+          "title": "Write a Landing Page",
+          "description": "Create a full landing page with headline, subheadline, benefits, and CTA.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What product, service, or lead magnet is this page for?",
+            "Who is the target visitor?",
+            "What is the single goal of this page?",
+            "What are the top 3 to 5 benefits to highlight?",
+            "What objections should the page address?"
+          ]
+        },
+        {
+          "id": "mc_007",
+          "title": "Write Product Descriptions That Sell",
+          "description": "Create persuasive product descriptions that highlight benefits and push buyers to act.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the product name and category?",
+            "What are its key features?",
+            "What benefits does it give the buyer?",
+            "Who is the ideal buyer?",
+            "What tone fits the brand (premium, playful, professional)?"
+          ]
+        },
+        {
+          "id": "mc_008",
+          "title": "Write 10 Headline Variations",
+          "description": "Generate multiple headline options for ads, landing pages, or articles.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the product, service, or content the headline is for?",
+            "Who is the target audience?",
+            "What main benefit or hook should be included?",
+            "What tone should the headlines use?",
+            "Should they include a number, question, or power word?"
+          ]
+        },
+        {
+          "id": "mc_009",
+          "title": "Define a Brand Voice and Messaging Guide",
+          "description": "Create a short brand voice guide that keeps your copy consistent across all channels.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What type of business or brand is this for?",
+            "Who is your target audience?",
+            "What 3 to 5 words describe how you want your brand to sound?",
+            "What tone should be avoided?",
+            "Can you share an example of copy you like or already use?"
+          ]
+        },
+        {
+          "id": "mc_010",
+          "title": "Write Copy That Handles Objections",
+          "description": "Create sales copy that addresses and overcomes common buyer hesitations.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What product or service are you selling?",
+            "What are the top 3 objections buyers raise?",
+            "What evidence or reassurance do you have to counter each objection?",
+            "Where will this copy appear (sales page, email, ad)?",
+            "What tone should it use (confident, empathetic, direct)?"
+          ]
+        },
+        {
+          "id": "mc_011",
+          "title": "Write a Value Proposition Statement",
+          "description": "Craft a one to two sentence statement that clearly explains what you do and why it matters.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What does your business do?",
+            "Who do you serve?",
+            "What specific result or benefit do you deliver?",
+            "What makes you different from alternatives?",
+            "What format do you need (tagline, full statement, elevator pitch)?"
+          ]
+        },
+        {
+          "id": "mc_012",
+          "title": "Build a Customer Avatar Profile",
+          "description": "Create a detailed profile of your ideal customer to sharpen your targeting and messaging.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What product or service are you marketing?",
+            "What do you already know about your existing customers?",
+            "What demographics matter most (age, location, income, job)?",
+            "What are their main goals and frustrations?",
+            "Where do they spend time online?"
+          ]
+        },
+        {
+          "id": "mc_013",
+          "title": "Write a 90-Day Content Marketing Plan",
+          "description": "Build a strategic content plan to attract, nurture, and convert your target audience.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What is the business goal this content plan supports?",
+            "Who is the target audience?",
+            "What content formats will you use (blog, video, email, social)?",
+            "What topics or pillars will you cover?",
+            "How will you measure content performance?"
+          ]
+        },
+        {
+          "id": "mc_014",
+          "title": "Design an A/B Test Plan for an Ad or Email",
+          "description": "Set up a simple A/B test to find what copy, subject line, or creative performs best.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What are you testing (ad, email, landing page)?",
+            "What specific element are you testing (headline, image, CTA, subject line)?",
+            "What are the two variations you want to test?",
+            "What is the success metric (open rate, click rate, conversion rate)?",
+            "How long will the test run and what sample size do you have?"
+          ]
+        },
+        {
+          "id": "mc_015",
+          "title": "Review and Improve Existing Marketing Copy",
+          "description": "Analyse your current copy and get specific edits to make it stronger.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "Paste the copy you want reviewed.",
+            "What is this copy for (ad, email, landing page, product description)?",
+            "What result is it currently getting?",
+            "What do you think is weak about it?",
+            "What should improved copy focus on achieving?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "creative_design",
+      "label": "Creative Design",
+      "prompts": [
+        {
+          "id": "cd_001",
+          "title": "Generate a Logo Concept Brief",
+          "description": "Create a detailed brief to guide a logo design for any brand or business.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the brand name and what does it do?",
+            "Who is the target audience?",
+            "What feeling should the logo communicate (bold, elegant, playful, minimal)?",
+            "Are there any colours or styles to include or avoid?",
+            "What formats will the logo be used in (digital, print, apparel)?"
+          ]
+        },
+        {
+          "id": "cd_002",
+          "title": "Build a Brand Identity Guide",
+          "description": "Create a simple brand identity document covering colours, fonts, tone, and logo usage.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the brand name and business type?",
+            "What are the brand values or personality traits?",
+            "What colour palette do you currently use or want?",
+            "What fonts do you use or prefer?",
+            "Who is the primary audience for this brand?"
+          ]
+        },
+        {
+          "id": "cd_003",
+          "title": "Suggest a UI Colour Palette",
+          "description": "Generate a balanced, accessible colour palette for a website or app interface.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the app or website for?",
+            "What mood should the design convey (calm, energetic, professional, friendly)?",
+            "Is there an existing brand colour to build around?",
+            "Who is the end user?",
+            "Should the palette meet accessibility contrast standards?"
+          ]
+        },
+        {
+          "id": "cd_004",
+          "title": "Write a Typography Pairing Recommendation",
+          "description": "Get font pairing suggestions for a website, brand, or design project.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the design project (website, app, poster, brand)?",
+            "What mood or style should the typography reflect?",
+            "Should fonts be from Google Fonts, Adobe Fonts, or system fonts?",
+            "Do you need a heading font, body font, or both?",
+            "Is there an existing font you are building around?"
+          ]
+        },
+        {
+          "id": "cd_005",
+          "title": "Write a UX Copy for App Screens",
+          "description": "Create clear, user-friendly copy for buttons, tooltips, error messages, and onboarding screens.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What type of app is this (productivity, e-commerce, finance, health)?",
+            "Which screens need copy (onboarding, error states, empty states, buttons)?",
+            "What tone should the copy use (friendly, professional, simple)?",
+            "Who is the end user?",
+            "Are there any words or phrases the brand avoids?"
+          ]
+        },
+        {
+          "id": "cd_006",
+          "title": "Design a Social Media Graphic Brief",
+          "description": "Write a detailed visual brief for a designer or AI tool to create a social media graphic.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What platform is the graphic for (Instagram, LinkedIn, Facebook, Twitter)?",
+            "What is the purpose of the post (promotion, announcement, quote, event)?",
+            "What text or headline should appear on the graphic?",
+            "What colours, fonts, or brand elements should be used?",
+            "What mood or visual style should it have?"
+          ]
+        },
+        {
+          "id": "cd_007",
+          "title": "Write a YouTube Thumbnail Concept",
+          "description": "Generate a thumbnail idea with layout, text, and visual direction that drives clicks.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the video topic?",
+            "What emotion should the thumbnail trigger (curiosity, urgency, excitement)?",
+            "Should a face or reaction appear in the thumbnail?",
+            "What short text or number should appear on it?",
+            "What are the brand colours or style guidelines?"
+          ]
+        },
+        {
+          "id": "cd_008",
+          "title": "Plan a Presentation Slide Deck Layout",
+          "description": "Get a structured slide-by-slide layout plan for any presentation.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the presentation topic?",
+            "Who is the audience?",
+            "How many slides do you need?",
+            "What key message must the deck communicate?",
+            "What visual style fits the context (corporate, creative, minimal)?"
+          ]
+        },
+        {
+          "id": "cd_009",
+          "title": "Write a Marketing Visual Brief",
+          "description": "Create a clear brief for a designer to produce a marketing banner, flyer, or poster.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the marketing material (banner, flyer, poster, email header)?",
+            "What is the campaign or message?",
+            "What are the dimensions or format requirements?",
+            "What brand assets must be included?",
+            "What is the call to action or key text?"
+          ]
+        },
+        {
+          "id": "cd_010",
+          "title": "Get Feedback on a Design Concept",
+          "description": "Analyse your design idea and receive constructive critique on clarity, hierarchy, and impact.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "Describe your design concept or paste a description of it.",
+            "What is the design for and who is the audience?",
+            "What problem is the design trying to solve?",
+            "What do you feel is working well so far?",
+            "What specific areas do you want feedback on?"
+          ]
+        },
+        {
+          "id": "cd_011",
+          "title": "Write a Client Design Brief Template",
+          "description": "Create a professional design brief template to collect clear project requirements from clients.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What type of design projects do you typically take on?",
+            "What information do you always need from clients before starting?",
+            "What questions help you understand their brand and audience?",
+            "How formal or conversational should the brief feel?",
+            "Should it include a section for budget, timeline, and revision limits?"
+          ]
+        },
+        {
+          "id": "cd_012",
+          "title": "Create a Design System Starter Kit",
+          "description": "Build the foundation of a design system with components, tokens, and usage rules.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What product or platform is this design system for?",
+            "What components do you need to define first (buttons, inputs, cards, typography)?",
+            "What design tokens need to be established (spacing, colour, radius, shadow)?",
+            "What team will use this system (designers, developers, or both)?",
+            "Are there existing brand guidelines to align with?"
+          ]
+        },
+        {
+          "id": "cd_013",
+          "title": "Audit and Improve a Website Visual Design",
+          "description": "Review your current website design and get specific improvement recommendations.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the website URL or describe its current design?",
+            "What is the site's purpose and main audience?",
+            "What visual issues or complaints have you noticed?",
+            "What parts of the design do you want to keep?",
+            "What is the priority area for improvement (hero, navigation, CTA, mobile layout)?"
+          ]
+        },
+        {
+          "id": "cd_014",
+          "title": "Plan a Brand Refresh Strategy",
+          "description": "Build a step-by-step plan to update an existing brand without losing recognition.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What brand are you refreshing and how old is it?",
+            "What currently works well that should stay?",
+            "What feels outdated or misaligned with your audience?",
+            "What new direction or feeling should the brand move toward?",
+            "What assets need to be updated (logo, colours, website, packaging)?"
+          ]
+        },
+        {
+          "id": "cd_015",
+          "title": "Write a Design Trend Analysis for Your Niche",
+          "description": "Get a breakdown of current design trends relevant to your industry and how to apply them.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What industry or niche is this design trend analysis for?",
+            "What design formats are most relevant to you (web, social, packaging, print)?",
+            "What has your current design style looked like?",
+            "Are you looking to follow trends or differentiate from them?",
+            "What is the goal of updating your visual approach?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coding",
+      "label": "Coding",
+      "prompts": [
+        {
+          "id": "co_001",
+          "title": "Write a Function to Solve a Specific Task",
+          "description": "Generate a clean, working function in your chosen language to handle a specific coding task.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What programming language are you using?",
+            "What should the function do?",
+            "What inputs will it receive?",
+            "What should it return or output?",
+            "Are there any edge cases or constraints to handle?"
+          ]
+        },
+        {
+          "id": "co_002",
+          "title": "Build a Simple Script to Automate a Task",
+          "description": "Create a script that automates a repetitive task such as file renaming, data formatting, or sending requests.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What task do you want to automate?",
+            "What language should the script be written in?",
+            "What inputs or files does the script work with?",
+            "What should happen when the script runs?",
+            "Should the script log results or handle errors?"
+          ]
+        },
+        {
+          "id": "co_003",
+          "title": "Generate a REST API Endpoint",
+          "description": "Write a working REST API endpoint for a specific action such as creating, reading, updating, or deleting data.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What framework or language is the API built with?",
+            "What does this endpoint need to do (GET, POST, PUT, DELETE)?",
+            "What data does it receive and what does it return?",
+            "Should it include validation or error handling?",
+            "Is there any authentication or middleware to consider?"
+          ]
+        },
+        {
+          "id": "co_004",
+          "title": "Create a Reusable UI Component",
+          "description": "Build a clean, reusable front-end component such as a button, modal, card, or form input.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What framework are you using (React, Vue, plain HTML/CSS)?",
+            "What component do you need (button, modal, form, card, dropdown)?",
+            "What props or options should it accept?",
+            "Should it include any interaction logic or state?",
+            "Are there style guidelines or a design system to follow?"
+          ]
+        },
+        {
+          "id": "co_005",
+          "title": "Write a Database Query for a Specific Use Case",
+          "description": "Generate a SQL or NoSQL query to fetch, filter, or update data based on your use case.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What database are you using (PostgreSQL, MySQL, MongoDB, SQLite)?",
+            "What data do you need to retrieve or change?",
+            "What tables or collections are involved?",
+            "Are there filters, joins, or conditions required?",
+            "Should the query be optimized for performance?"
+          ]
+        },
+        {
+          "id": "co_006",
+          "title": "Debug an Error in My Code",
+          "description": "Identify the cause of a bug or error message and get a clear fix with explanation.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What language or framework is the code written in?",
+            "Paste the code that is causing the error.",
+            "What error message or unexpected behaviour are you seeing?",
+            "What did you expect the code to do?",
+            "What have you already tried to fix it?"
+          ]
+        },
+        {
+          "id": "co_007",
+          "title": "Review My Code for Quality and Best Practices",
+          "description": "Get a structured code review covering readability, structure, naming, and potential issues.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What language is this code written in?",
+            "Paste the code you want reviewed.",
+            "What is the code supposed to do?",
+            "Are there specific areas you are worried about?",
+            "Should the review focus on performance, readability, or both?"
+          ]
+        },
+        {
+          "id": "co_008",
+          "title": "Optimise Slow or Inefficient Code",
+          "description": "Analyse code that is slow, bloated, or repetitive and rewrite it to run more efficiently.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What language or environment is the code running in?",
+            "Paste the code that needs optimisation.",
+            "What performance issue are you experiencing (slow load, high memory, slow queries)?",
+            "Is there a specific bottleneck you have already identified?",
+            "Are there any constraints such as library restrictions or runtime limits?"
+          ]
+        },
+        {
+          "id": "co_009",
+          "title": "Convert Code from One Language to Another",
+          "description": "Translate a working code snippet or function from one programming language to another.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What language is the original code written in?",
+            "Paste the code you want to convert.",
+            "What language should it be converted to?",
+            "Should the logic stay exactly the same or can it use idiomatic patterns?",
+            "Are there any libraries or dependencies to account for?"
+          ]
+        },
+        {
+          "id": "co_010",
+          "title": "Write Unit Tests for My Code",
+          "description": "Generate unit tests to cover the key behaviours and edge cases of a function or module.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What language or testing framework should be used (Jest, PyTest, JUnit, etc.)?",
+            "Paste the function or module to be tested.",
+            "What are the expected inputs and outputs?",
+            "Are there edge cases or error states that must be tested?",
+            "Should mocks or stubs be used for external dependencies?"
+          ]
+        },
+        {
+          "id": "co_011",
+          "title": "Explain How a Piece of Code Works",
+          "description": "Break down any code snippet line by line so you understand exactly what it does and why.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "Paste the code you want explained.",
+            "What language is it written in?",
+            "What is your current level of coding experience?",
+            "Is there a specific part you are most confused about?",
+            "Should the explanation be simple and plain or more technical?"
+          ]
+        },
+        {
+          "id": "co_012",
+          "title": "Learn a Programming Concept with Examples",
+          "description": "Get a clear explanation of any coding concept with simple examples you can run and test.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What concept do you want to learn (loops, recursion, APIs, async, etc.)?",
+            "What language should the examples use?",
+            "How familiar are you with coding in general?",
+            "Do you want a real-world analogy to help explain it?",
+            "Should the explanation include a short practice exercise?"
+          ]
+        },
+        {
+          "id": "co_013",
+          "title": "Build a Learning Roadmap for a Programming Goal",
+          "description": "Get a step-by-step learning plan to reach a specific coding goal such as building apps, getting a job, or learning a new language.",
+          "tier": "premium",
+          "difficulty": "beginner",
+          "stages": [
+            "What is your coding goal (get a job, build a product, learn a framework)?",
+            "What is your current skill level?",
+            "How many hours per week can you commit to learning?",
+            "What language or technology area are you focused on?",
+            "Do you prefer hands-on projects or structured theory first?"
+          ]
+        },
+        {
+          "id": "co_014",
+          "title": "Design the Architecture for a New App or System",
+          "description": "Plan the technical structure of a new application including components, data flow, and technology choices.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What type of app or system are you building?",
+            "Who are the end users and how many do you expect?",
+            "What are the core features the system must support?",
+            "Do you have preferred languages, frameworks, or cloud providers?",
+            "What are the biggest technical risks or constraints?"
+          ]
+        },
+        {
+          "id": "co_015",
+          "title": "Refactor a Codebase for Scalability",
+          "description": "Restructure existing code to improve maintainability, scalability, and team readability.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What language and framework is the codebase using?",
+            "What is the main problem with the current structure (hard to maintain, too slow, messy)?",
+            "Paste a representative sample of the code or describe its structure.",
+            "How large is the codebase and how many people work on it?",
+            "Are there specific patterns you want to move toward (MVC, microservices, clean architecture)?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "educators",
+      "label": "Educators",
+      "prompts": [
+        {
+          "id": "ed_001",
+          "title": "Write a Lesson Plan for Any Subject",
+          "description": "Generate a structured lesson plan with objectives, activities, and assessment for any topic or grade level.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What subject and topic is the lesson covering?",
+            "What grade level or age group is this for?",
+            "How long is the lesson (30, 45, or 60 minutes)?",
+            "What should students be able to do by the end of the lesson?",
+            "Are there any resources, tools, or constraints to consider?"
+          ]
+        },
+        {
+          "id": "ed_002",
+          "title": "Create a Quiz or Assessment for a Topic",
+          "description": "Build a ready-to-use quiz with questions, answer types, and an answer key for any subject.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What subject and topic should the quiz cover?",
+            "What grade level is this for?",
+            "How many questions do you need?",
+            "What question types should be included (multiple choice, short answer, true or false)?",
+            "What difficulty level should the questions target?"
+          ]
+        },
+        {
+          "id": "ed_003",
+          "title": "Design a Grading Rubric",
+          "description": "Create a clear, fair rubric with criteria and scoring levels for any assignment or project.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What assignment or task is being graded?",
+            "What grade level or course is this for?",
+            "What are the key skills or outcomes being assessed?",
+            "How many performance levels should the rubric have (3, 4, or 5)?",
+            "Should the rubric use points, percentages, or descriptive labels?"
+          ]
+        },
+        {
+          "id": "ed_004",
+          "title": "Write Clear Learning Objectives",
+          "description": "Turn a broad topic into specific, measurable learning objectives students can understand and work toward.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What subject and topic are the objectives for?",
+            "What grade level or age group is this targeting?",
+            "How many objectives do you need?",
+            "What cognitive level should they target (recall, apply, analyse, create)?",
+            "Should objectives follow a specific format such as Bloom's Taxonomy?"
+          ]
+        },
+        {
+          "id": "ed_005",
+          "title": "Build a Unit Plan for a Topic",
+          "description": "Plan a multi-week unit with lessons, assessments, and key milestones for a specific topic.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What subject and topic does the unit cover?",
+            "What grade level is this for?",
+            "How many weeks or lessons should the unit span?",
+            "What are the key outcomes students must reach by the end?",
+            "Are there any standards or curriculum frameworks to align with?"
+          ]
+        },
+        {
+          "id": "ed_006",
+          "title": "Generate Discussion Questions for a Text or Topic",
+          "description": "Create thought-provoking questions that spark classroom discussion and deeper thinking.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What text, topic, or concept is being discussed?",
+            "What grade level or age group is this for?",
+            "How many questions do you need?",
+            "Should questions be open-ended, text-based, or opinion-driven?",
+            "What thinking skills should the questions develop (analysis, reflection, debate)?"
+          ]
+        },
+        {
+          "id": "ed_007",
+          "title": "Design an Engaging Classroom Activity",
+          "description": "Create a hands-on or interactive activity that helps students practise or explore a concept.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What concept or skill should the activity teach or reinforce?",
+            "What grade level or age group is it for?",
+            "How much time is available for the activity?",
+            "Should it be individual, paired, or group work?",
+            "Are there any materials or technology limitations?"
+          ]
+        },
+        {
+          "id": "ed_008",
+          "title": "Differentiate a Lesson for Mixed Ability Groups",
+          "description": "Adapt a lesson or activity to meet the needs of students with different skill levels in the same class.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the original lesson or activity?",
+            "What subject and grade level is this for?",
+            "What ability levels are you differentiating for (struggling, on level, advanced)?",
+            "What specific challenges do your lower or higher level students face?",
+            "Should the differentiation change the task, the support, or the expected output?"
+          ]
+        },
+        {
+          "id": "ed_009",
+          "title": "Create a Project-Based Learning Task",
+          "description": "Design a real-world project that connects curriculum goals to a meaningful student challenge.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What subject and topic should the project connect to?",
+            "What grade level is this for?",
+            "How long should the project run (1 week, 2 weeks, longer)?",
+            "What real-world problem or scenario should students engage with?",
+            "How will the project be assessed or presented?"
+          ]
+        },
+        {
+          "id": "ed_010",
+          "title": "Gamify a Lesson or Unit",
+          "description": "Add game mechanics such as points, challenges, levels, or rewards to make learning more engaging.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What lesson, unit, or subject do you want to gamify?",
+            "What grade level or age group is this for?",
+            "What game elements appeal to your students (points, leaderboards, badges, challenges)?",
+            "How much class time can be spent on the gamified element?",
+            "Should it be competitive, collaborative, or individual?"
+          ]
+        },
+        {
+          "id": "ed_011",
+          "title": "Write a Parent Communication Email",
+          "description": "Draft a clear, professional email to a parent about student progress, behaviour, or an upcoming event.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the purpose of the email (progress update, concern, event, positive news)?",
+            "What grade level or subject do you teach?",
+            "What key information needs to be communicated?",
+            "What tone should the email use (warm, direct, formal)?",
+            "Is there any action you need the parent to take?"
+          ]
+        },
+        {
+          "id": "ed_012",
+          "title": "Write Meaningful Student Feedback",
+          "description": "Generate specific, constructive feedback on student work that guides improvement without discouraging effort.",
+          "tier": "premium",
+          "difficulty": "beginner",
+          "stages": [
+            "What assignment or task is the feedback for?",
+            "What did the student do well?",
+            "What are the main areas that need improvement?",
+            "What is the student's current level (struggling, meeting expectations, exceeding)?",
+            "Should the feedback be written for the student directly or for a report?"
+          ]
+        },
+        {
+          "id": "ed_013",
+          "title": "Create a Classroom Behaviour Management Plan",
+          "description": "Build a practical plan with clear expectations, consequences, and positive strategies for managing classroom behaviour.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What age group or grade level is the plan for?",
+            "What are the main behaviour challenges in your classroom?",
+            "What positive reinforcement strategies do you want to use?",
+            "What consequence structure should be in place?",
+            "Should the plan include communication steps with parents or leadership?"
+          ]
+        },
+        {
+          "id": "ed_014",
+          "title": "Write a Student Progress Report",
+          "description": "Generate a clear, balanced progress report for a student covering academic performance and effort.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What subject or subjects does the report cover?",
+            "What is the student's current level of performance?",
+            "What are their strengths?",
+            "What areas need development?",
+            "What tone should the report use and who is the audience (parents, school admin)?"
+          ]
+        },
+        {
+          "id": "ed_015",
+          "title": "Design a Curriculum Scope and Sequence",
+          "description": "Map out what to teach, in what order, and when across a full term or year for a subject.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What subject are you mapping the curriculum for?",
+            "What grade level or course is this for?",
+            "How long is the teaching period (one term, two terms, full year)?",
+            "What are the key topics or units that must be covered?",
+            "Are there curriculum standards or frameworks to align with?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "career_and_jobs",
+      "label": "Career and Jobs",
+      "prompts": [
+        {
+          "id": "cj_001",
+          "title": "Write or Improve My CV",
+          "description": "Create a polished, role-specific CV that highlights your experience, skills, and achievements clearly.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What role or industry are you targeting?",
+            "What is your current job title and years of experience?",
+            "List your last 2 to 3 roles with responsibilities and key achievements.",
+            "What skills, tools, or certifications are relevant to the role?",
+            "Should the CV follow a specific format or length requirement?"
+          ]
+        },
+        {
+          "id": "cj_002",
+          "title": "Write a Cover Letter for a Job Application",
+          "description": "Draft a focused cover letter that connects your experience to a specific job and company.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the job title and company you are applying to?",
+            "What are the key requirements listed in the job description?",
+            "What relevant experience or achievements make you a strong fit?",
+            "Why do you want to work at this specific company?",
+            "What tone should the letter use (formal, confident, conversational)?"
+          ]
+        },
+        {
+          "id": "cj_003",
+          "title": "Optimise My LinkedIn Profile",
+          "description": "Rewrite your LinkedIn headline, summary, and experience sections to attract recruiters and opportunities.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is your current job title and field?",
+            "What type of roles or opportunities are you looking for?",
+            "What are your top 3 professional strengths or achievements?",
+            "What keywords are common in your target job descriptions?",
+            "Should the tone be professional, approachable, or a mix of both?"
+          ]
+        },
+        {
+          "id": "cj_004",
+          "title": "Build a Job Search Strategy",
+          "description": "Create a focused plan for finding and landing a job in your target field within a specific timeframe.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What type of role are you looking for?",
+            "What is your current employment situation?",
+            "What is your target timeframe to land a new role?",
+            "What platforms or methods have you already tried?",
+            "Are there location, remote, or industry preferences to factor in?"
+          ]
+        },
+        {
+          "id": "cj_005",
+          "title": "Write a Job Application Follow-Up Email",
+          "description": "Draft a professional follow-up email after submitting an application or completing an interview.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What stage are you following up on (application, interview, offer)?",
+            "What is the job title and company name?",
+            "How long ago did you submit or interview?",
+            "What is the main goal of the email (check status, express interest, ask for feedback)?",
+            "What tone should the email use?"
+          ]
+        },
+        {
+          "id": "cj_006",
+          "title": "Prepare for a Job Interview",
+          "description": "Get a tailored set of likely interview questions with guidance on how to answer each one well.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the job title and industry?",
+            "What type of interview is it (behavioural, technical, panel, competency-based)?",
+            "What are the key skills or requirements listed in the job description?",
+            "What is your biggest concern going into the interview?",
+            "How much experience do you have in this type of role?"
+          ]
+        },
+        {
+          "id": "cj_007",
+          "title": "Write a Strong Answer to a Tough Interview Question",
+          "description": "Structure a confident, clear answer to a specific interview question using a proven format.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "What is the interview question you need to answer?",
+            "What role or industry is this interview for?",
+            "What relevant experience or example can you draw from?",
+            "Should the answer use the STAR format (Situation, Task, Action, Result)?",
+            "How long should the answer be (30 seconds, 1 minute, 2 minutes)?"
+          ]
+        },
+        {
+          "id": "cj_008",
+          "title": "Negotiate a Job Offer or Salary",
+          "description": "Get a clear negotiation strategy and example scripts for discussing salary, benefits, or terms.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is the offer you have received (salary, role, benefits)?",
+            "What is your target salary or what specifically do you want to negotiate?",
+            "What is your current or most recent salary?",
+            "What leverage do you have (competing offer, specialised skills, market rate)?",
+            "Should the negotiation happen over email or phone?"
+          ]
+        },
+        {
+          "id": "cj_009",
+          "title": "Write a Post-Interview Thank You Email",
+          "description": "Send a thoughtful thank you email that reinforces your interest and leaves a strong final impression.",
+          "tier": "free",
+          "difficulty": "beginner",
+          "stages": [
+            "Who did you interview with (name and title)?",
+            "What role and company was the interview for?",
+            "What was one memorable topic or moment from the interview?",
+            "What key strength or point do you want to reinforce?",
+            "How soon after the interview are you sending this?"
+          ]
+        },
+        {
+          "id": "cj_010",
+          "title": "Evaluate a Job Offer",
+          "description": "Analyse a job offer across salary, growth, culture, and trade-offs to help you decide whether to accept.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What are the full details of the offer (salary, title, benefits, location)?",
+            "What are your current compensation and working conditions?",
+            "What matters most to you in a role (salary, growth, flexibility, stability)?",
+            "Are there any concerns or red flags about the offer or company?",
+            "Do you have other offers or options you are comparing this to?"
+          ]
+        },
+        {
+          "id": "cj_011",
+          "title": "Create a 12-Month Career Growth Plan",
+          "description": "Build a focused plan to reach your next career milestone over the next year.",
+          "tier": "free",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your current role and level?",
+            "What is your career goal for the next 12 months?",
+            "What skills or experience do you need to get there?",
+            "What obstacles or gaps are currently holding you back?",
+            "How much time per week can you invest in career development?"
+          ]
+        },
+        {
+          "id": "cj_012",
+          "title": "Identify and Close Your Skill Gaps",
+          "description": "Compare your current skills to your target role and get a practical plan to close the gap.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your current role and skill set?",
+            "What role or level are you aiming for?",
+            "What skills or qualifications does that role typically require?",
+            "Which of those skills do you already have?",
+            "What resources or learning methods work best for you?"
+          ]
+        },
+        {
+          "id": "cj_013",
+          "title": "Build a Case for a Promotion",
+          "description": "Prepare a clear, evidence-based case to present to your manager when asking for a promotion.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your current role and the role you are seeking?",
+            "What key achievements or contributions have you made?",
+            "How have you gone beyond your current job description?",
+            "What is the business case for promoting you now?",
+            "How do you plan to present this (email, meeting, formal review)?"
+          ]
+        },
+        {
+          "id": "cj_014",
+          "title": "Develop Your Professional Personal Brand",
+          "description": "Define what you want to be known for professionally and how to communicate it consistently online and offline.",
+          "tier": "premium",
+          "difficulty": "intermediate",
+          "stages": [
+            "What is your field or area of expertise?",
+            "What do you want to be known for professionally?",
+            "Who is your target audience (employers, clients, peers, industry)?",
+            "What platforms or channels will you use to build your brand?",
+            "What does your current professional presence look like?"
+          ]
+        },
+        {
+          "id": "cj_015",
+          "title": "Write a Difficult Workplace Email",
+          "description": "Draft a professional email for a sensitive workplace situation such as pushing back, escalating an issue, or setting a boundary.",
+          "tier": "premium",
+          "difficulty": "advanced",
+          "stages": [
+            "What is the situation you need to address?",
+            "Who is the email going to (manager, colleague, HR, client)?",
+            "What outcome do you want from sending this email?",
+            "What tone do you need to strike (firm, diplomatic, calm, direct)?",
+            "Is there any context or history the reader needs to understand?"
+          ]
+        }
+      ]
+    }
+  ]
+}
