@@ -3,43 +3,47 @@ import os
 import pymongo
 from dotenv import load_dotenv
 
-# 1. Step out of the room to find the secret keys FIRST
+# 1. Load secret keys first
 load_dotenv("../.env")
 
-# 2. Print to confirm it loaded correctly
-print(f"Testing URI: {os.getenv('MONGO_URI')}")
-
-# 3. Get the secret connection string
+# 2. Get connection string
 mongo_uri = os.getenv("MONGO_URI")
 
-# 4. Set up the client to talk to the cloud
+# 3. Connect to MongoDB
 client = pymongo.MongoClient(mongo_uri)
 
-# 5. Point to your specific database and shelf
+# 4. Point to database and collection
 db = client["mozaic_db"]
 collection = db["prompts"]
 
 def import_data():
     try:
-        # 6. Open the JSON file in 'read' mode
+        # 5. Delete all existing prompts first
+        collection.delete_many({})
+        print("Old prompts cleared successfully.")
+
+        # 6. Open the JSON file
         with open("prompts.json", "r") as file:
             data = json.load(file)
-            
+
         all_prompts = []
-        
-        # 7. Look inside each category bag and grab the "prompts" list
+
+        # 7. Loop through categories and attach label to each prompt
         for category in data["categories"]:
-            all_prompts.extend(category["prompts"])
-            
-        # 8. Push the whole collection to MongoDB
+            for prompt in category["prompts"]:
+                prompt["category_id"] = category["id"]
+                prompt["category_label"] = category["label"]
+                all_prompts.append(prompt)
+
+        # 8. Insert all prompts with category labels
         if all_prompts:
             result = collection.insert_many(all_prompts)
-            print(f"Oshey! Successfully inserted {len(result.inserted_ids)} prompts into MongoDB.")
+            print(f"Oshey! Successfully inserted {len(result.inserted_ids)} prompts.")
         else:
-            print("The bag was empty, boss.")
-            
+            print("No prompts found.")
+
     except Exception as e:
-        print(f"Wait, an error occurred: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     import_data()

@@ -4,6 +4,12 @@ os.environ["SENTENCE_TRANSFORMERS_HOME"] = "/tmp/.cache"
 
 from dotenv import load_dotenv
 load_dotenv()
+from pymongo import MongoClient
+
+mongo_uri = os.environ["MONGO_URI"]
+mongo_client = MongoClient(mongo_uri)
+db = mongo_client["mozaic_db"]
+prompts_collection = db["prompts"]
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -111,7 +117,27 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {"message": "🤖 MozaicTeck RAG API is running!"}
-
+#start endpoint for fetching prompts by category from monogodb
+@app.get("/prompts")
+def get_prompts(category: str = None):
+    query = {}
+    if category:
+        query["category_label"] = category
+    results = list(prompts_collection.find(query, {"_id": 0}))
+    return {"prompts": results}
+##end of prompts endpoint
+#start endpoint for searching prompts by keyword from mongodb
+@app.get("/prompts/search")
+def search_prompts(q: str):
+    results = list(prompts_collection.find(
+        {"$or": [
+            {"title": {"$regex": q, "$options": "i"}},
+            {"description": {"$regex": q, "$options": "i"}}
+        ]},
+        {"_id": 0}
+    ))
+    return {"prompts": results}
+#end of search endpoint
 @app.post("/ask")
 def ask(body: Question):
     docs = get_retriever().invoke(body.question)
