@@ -126,6 +126,14 @@ def get_prompts(category: str = None):
     results = list(prompts_collection.find(query, {"_id": 0}))
     return {"prompts": results}
 ##end of prompts endpoint
+#start endpoint for fetching all unique categories from mongodb
+@app.get("/prompts/categories")
+def get_categories():
+    # Uses MongoDB distinct to return only unique category_label values.
+    # More efficient than fetching all 120 prompts just to read category names.
+    categories = prompts_collection.distinct("category_label")
+    return {"categories": sorted(categories)}
+#end of categories endpoint
 #start endpoint for searching prompts by keyword from mongodb
 @app.get("/prompts/search")
 def search_prompts(q: str):
