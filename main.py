@@ -11,6 +11,8 @@ mongo_client = MongoClient(mongo_uri)
 db = mongo_client["mozaic_db"]
 prompts_collection = db["prompts"]
 
+conversations_collection = db["conversations"]
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -103,6 +105,12 @@ chain = prompt | llm | StrOutputParser()
 class Question(BaseModel):
     question: str
     history: list = []
+# Model for saving a conversation message to MongoDB.
+# Stores the session id, the user message, and the bot response together.
+class ConversationMessage(BaseModel):
+    session_id: str
+    user_message: str
+    bot_response: str
 
 # PART 4 — Open the restaurant doors!
 app = FastAPI()
@@ -182,3 +190,20 @@ Knowledge base context:
             return {"answer": "I am currently at capacity. Please try again in a few minutes."}
         
         return {"answer": "Something went wrong. Please try again."}
+    # Endpoint to save a conversation message to MongoDB.
+# Receives session_id, user_message and bot_response.
+# Pushes both messages into the messages array for that session.
+@app.post("/conversations/save")
+def save_conversation(body: ConversationMessage):
+    try:
+        conversations_collection.update_one(
+            {"session_id": body.session_id},
+            {"$push": {"messages": {
+                "user": body.user_message,
+                "bot": body.bot_response
+            }}},
+            upsert=True
+        )
+        return {"status": "saved"}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
