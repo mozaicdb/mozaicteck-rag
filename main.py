@@ -37,6 +37,40 @@ def get_retriever():
         )
         retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
     return retriever
+# Sync function — reads all prompts from MongoDB and reloads ChromaDB fresh.
+# This runs every time the server starts to keep ChromaDB up to date.
+def sync_chroma_from_mongodb():
+    print("Starting ChromaDB sync from MongoDB...")
+
+    # Step 1: Read all 120 prompts from MongoDB
+    all_prompts = list(prompts_collection.find({}, {"_id": 0}))
+    print(f"Found {len(all_prompts)} prompts in MongoDB")
+
+    # Step 2: Convert each prompt into a single text string
+    documents = []
+    for p in all_prompts:
+        stages_text = " ".join(p.get("stages", []))
+        text = f"Title: {p.get('title', '')}\nDescription: {p.get('description', '')}\nCategory: {p.get('category_label', '')}\nStages: {stages_text}"
+        documents.append(text)
+
+    # Step 3: Load embeddings
+    emb = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+    # Step 4: Delete old ChromaDB collection completely then reload fresh
+    old_store = Chroma(
+        persist_directory="./chroma_db",
+        embedding_function=emb
+    )
+    old_store.delete_collection()
+    print("Old ChromaDB collection deleted.")
+
+    # Step 5: Reload ChromaDB with fresh 120 prompts from MongoDB
+    Chroma.from_texts(
+        texts=documents,
+        embedding=emb,
+        persist_directory="./chroma_db"
+    )
+    print("ChromaDB sync complete. Fresh prompts loaded.")
 
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
@@ -115,6 +149,11 @@ class ConversationMessage(BaseModel):
 # PART 4 — Open the restaurant doors!
 app = FastAPI()
 
+# Startup event — automatically runs sync_chroma_from_mongodb 
+# every time the FastAPI server starts.
+@app.on_event("startup")
+async def startup_event():
+    sync_chroma_from_mongodb()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
