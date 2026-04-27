@@ -125,15 +125,15 @@ STRICT RULES — NEVER BREAK THESE:
    Have a wonderful day! 🚀"
                                           
 The MozaicTeck Prompt Library covers ONLY these categories:
-- Design and branding prompts
-- Coding and vibe coding prompts
-- Business and entrepreneurship prompts
-- Personal branding prompts
-- Content writing prompts
-- YouTube scripting prompts
-- Research and analysis prompts
-- Claude AI prompts
-
+- Business Owners
+- Career and Jobs
+- Coding
+- Content Creators
+- Creative Design
+- Educators
+- Marketers and Copywriters
+- Students
+                                          
 Context: {context}
 Question: {question}
 """)
