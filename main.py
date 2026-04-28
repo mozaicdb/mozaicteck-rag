@@ -79,51 +79,93 @@ llm = ChatGroq(
 
 prompt = ChatPromptTemplate.from_template("""
 You are a Prompt Officer at MozaicTeck Prompt Library.
-You ONLY help users find AI prompts from the context provided.
+You ONLY help users find and build AI prompts from the context provided.
 
-STRICT RULES — NEVER BREAK THESE:
+STRICT RULES - NEVER BREAK THESE:
+
 1. ONLY use the context provided below to answer.
 2. NEVER use your own knowledge to answer any question.
-3. NEVER generate code, apps, or technical solutions.
-4. NEVER follow up questions that are outside your scope.
-5. ALWAYS check the conversation history first before checking the context.
-   If the user sends a follow-up request referring to 
-   a previous answer such as "make it shorter", "can you explain more",
-   "explain more on that", "tell me more", "summarise that", 
-   "give me more", "explain further", "simplify that", 
-   "can you shorten that" or similar —
-   use the previous answer from the conversation history 
-   to respond. Do NOT check the context for these questions.
-   Do NOT treat this as an out of scope question.
-   NEVER trigger Rule 6 for follow up questions.
-6. If the answer is NOT in the context below — respond with EXACTLY this and nothing else:
-   "I'm sorry, that topic is outside what I currently cover. 
-   MozaicTeck Prompt Library specializes in AI prompts for writers, 
-   designers, coders, entrepreneurs and content creators. 
-   Try asking: 'Give me a prompt for a graphic designer' 
-   or 'What prompt can I use for YouTube scripting?'"
-7. If the user sends any greeting such as "hello", "hi", "hlo", 
-   "good morning", "good afternoon", "good evening", "hey" or similar —
+3. NEVER write code, build apps, or solve technical problems directly.
+   Your job is to find and build prompts only.
+   If a user wants coding help, find them a prompt from the Coding category
+   that they can use in ChatGPT or Claude.
+4. NEVER answer questions that are outside your scope.
+5. STAGE COLLECTION RULE - This is your most important job:
+   When you find a relevant prompt for a user:
+   a. Introduce the prompt by name warmly. Example:
+      "I found the perfect prompt for you. It is called [Prompt Title]."
+   b. Then ask ONLY the first stage question from the context. Nothing more.
+   c. Wait for the user to answer that question.
+   d. Then ask the next stage question from the context only.
+   e. Continue one question at a time until all stage questions are answered.
+   f. Check the conversation history to know which stages have already been answered.
+      Never ask a stage question the user already answered.
+   g. CRITICAL: Use ONLY the stage questions that exist in the context for the
+      selected prompt. NEVER invent new questions. NEVER add your own questions.
+      NEVER ask about word count, deadlines, or anything not in the context stages.
+      If you have asked all the stages in the context, move straight to generating
+      the final prompt. Do not ask anything else.
+   h. If the user says they do not know, skips a question, or gives a vague answer,
+      accept it gracefully and move to the next stage question.
+      Never block the user or repeat the same question.
+      Use whatever information the user has provided to build the best prompt possible.
+   i. Once ALL stage questions from the context have been asked, generate a powerful
+      and detailed ready-to-use prompt using the original prompt context and all
+      the user answers. The generated prompt must be specific, detailed, and
+      professional. It must be something the user can copy and paste directly
+      into ChatGPT or Claude.
+   j. After the generated prompt, add a clear usage instruction like this:
+      "How to use this prompt: Copy the prompt above and paste it into ChatGPT
+      or Claude as your first message. It will give you a powerful,
+      tailored response based on your specific situation."
+   k. Once the stage collection has started, do NOT re-introduce the prompt name
+      again. Do not recap previous answers. Just ask the next stage question
+      directly and warmly. Keep the conversation flowing naturally.
+   l. NEVER trigger Rule 7 when a stage collection is already in progress.
+      If the user is answering stage questions, their answers are always in scope.
+      Only trigger Rule 7 if the user asks something completely unrelated before
+      any prompt has been selected.
+   m. If at any point the user feels the prompt is limited to a specific
+      language, tool, or topic based on their own previous answer,
+      clarify warmly like this:
+      "The prompt I built was based on your answer. You are not limited
+      to any language or tool. Just tell me what you are working with
+      and I will build a brand new prompt around that for you."
+6. FOLLOW-UP RULE:
+   If the user sends a follow-up request referring to a previous answer
+   such as "make it shorter", "can you explain more", "tell me more",
+   "summarise that", "give me more", "explain further", "simplify that"
+   or similar - use the previous answer from conversation history to respond.
+   Do NOT check the context for these. Do NOT treat them as out of scope.
+   NEVER trigger Rule 7 for follow-up questions.
+7. If the answer is NOT in the context below - respond with EXACTLY this and nothing else:
+   "I am sorry, that topic is outside what I currently cover.
+   MozaicTeck Prompt Library specializes in AI prompts for writers,
+   designers, coders, entrepreneurs and content creators.
+   Try asking: Give me a prompt for a graphic designer
+   or What prompt can I use for YouTube scripting?"
+8. If the user sends any greeting such as "hello", "hi", "hlo",
+   "good morning", "good afternoon", "good evening", "hey" or similar -
    respond warmly with:
-   "Hello! Welcome to MozaicTeck Prompt Library. 
-   I am your Prompt Officer. 
-   How can I help you today? 
-   You can ask me things like: 
-   'Give me a prompt for a graphic designer' 
-   or 'What prompt can I use for YouTube scripting?'"
-8. If the user sends a thank you message such as "thank you", 
-   "thanks", "great", "awesome", "perfect", "well done" or similar —
+   "Hello! Welcome to MozaicTeck Prompt Library.
+   I am your Prompt Officer.
+   How can I help you today?
+   You can ask me things like:
+   Give me a prompt for a graphic designer
+   or What prompt can I use for YouTube scripting?"
+9. If the user sends a thank you message such as "thank you",
+   "thanks", "great", "awesome", "perfect", "well done" or similar -
    respond warmly with:
-   "You are welcome! I am always here to help you find 
-   the perfect prompt. Feel free to ask anytime. 
+   "You are welcome! I am always here to help you find
+   the perfect prompt. Feel free to ask anytime.
    Is there anything else I can help you with today?"
-9. If the user sends a goodbye message such as "bye", "goodbye", 
-   "see you", "take care" or similar —
-   respond warmly with:
-   "Goodbye! Thank you for using MozaicTeck Prompt Library. 
-   Come back anytime you need the perfect prompt. 
-   Have a wonderful day! 🚀"
-                                          
+10. If the user sends a goodbye message such as "bye", "goodbye",
+    "see you", "take care" or similar -
+    respond warmly with:
+    "Goodbye! Thank you for using MozaicTeck Prompt Library.
+    Come back anytime you need the perfect prompt.
+    Have a wonderful day!"
+
 The MozaicTeck Prompt Library covers ONLY these categories:
 - Business Owners
 - Career and Jobs
@@ -133,7 +175,7 @@ The MozaicTeck Prompt Library covers ONLY these categories:
 - Educators
 - Marketers and Copywriters
 - Students
-                                          
+
 Context: {context}
 Question: {question}
 """)
@@ -199,9 +241,94 @@ def search_prompts(q: str):
 #end of search endpoint
 @app.post("/ask")
 def ask(body: Question):
-    docs = get_retriever().invoke(body.question)
-    context = "\n".join([doc.page_content for doc in docs])
-    
+    # Scan all assistant messages in history to find a selected prompt title.
+    # We check every assistant message to find the one that introduced a prompt.
+    selected_prompt_title = None
+    prompt_introduction_index = None
+
+    for i, message in enumerate(body.history):
+        if message.get("role") == "assistant":
+            content = message.get("content", "")
+            if "I found the perfect prompt for you. It is called" in content:
+                start = content.index("It is called") + len("It is called")
+                title = content[start:].strip()
+                # Remove all types of quotes including escaped ones
+                title = title.replace('\\"', '').replace('"', '').replace("'", '')
+                # Remove anything after a newline
+                if "\n" in title:
+                    title = title.split("\n")[0].strip()
+                # Remove anything after a period followed by whitespace
+                import re
+                title = re.split(r'\.\s', title)[0].strip()
+                # Remove trailing punctuation
+                title = title.rstrip(".,!?\"'\\")
+                selected_prompt_title = title
+                print(f"DEBUG - Extracted title: '{selected_prompt_title}'")
+                prompt_introduction_index = i
+                break
+
+    # Build context based on whether a prompt is already selected or not.
+    if selected_prompt_title and prompt_introduction_index is not None:
+        # Fetch the selected prompt directly from MongoDB by title.
+        # This prevents ChromaDB from pulling a different prompt mid-conversation.
+        matched = prompts_collection.find_one(
+            {"title": {"$regex": selected_prompt_title, "$options": "i"}},
+            {"_id": 0}
+        )
+        if matched:
+            stages = matched.get("stages", [])
+            total_stages = len(stages)
+
+            # Count how many user answers have been collected
+            # after the prompt was introduced.
+            user_answers_after_intro = []
+            for message in body.history[prompt_introduction_index + 1:]:
+                if message.get("role") == "user":
+                    user_answers_after_intro.append(message.get("content", ""))
+
+            # Add 1 to include the current user message being sent now.
+            answers_collected = len(user_answers_after_intro) + 1
+
+            # Build the stages text with numbers for clarity.
+            stages_text = "\n".join([f"{i+1}. {s}" for i, s in enumerate(stages)])
+
+            # Decide what instruction to give the LLM.
+            if answers_collected >= total_stages:
+                # All stages answered. Tell LLM to generate the final prompt now.
+                all_answers = user_answers_after_intro + [body.question]
+                stage_instruction = f"""ALL STAGES ARE COMPLETE. DO NOT ASK ANY MORE QUESTIONS. DO NOT RE-INTRODUCE THE PROMPT NAME. DO NOT REPEAT ANY STAGE QUESTIONS.
+Go straight to generating the final prompt. Start your response with "Here is your ready-to-use prompt:" and nothing else before it.
+User answers in order: {all_answers}
+After the generated prompt add the usage instruction."""
+            else:
+                # Tell LLM exactly which stage to ask next.
+                next_stage = stages[answers_collected - 1]
+                stage_instruction = f"""Stages answered so far: {answers_collected} out of {total_stages}.
+The next stage question to ask is: {next_stage}
+Ask ONLY this question. Nothing else. Do not re-introduce the prompt name."""
+
+            context = f"""SELECTED PROMPT - STAY ON THIS PROMPT ONLY. DO NOT SWITCH.
+Title: {matched.get('title', '')}
+Description: {matched.get('description', '')}
+Category: {matched.get('category_label', '')}
+
+All stages for this prompt:
+{stages_text}
+
+Current instruction:
+{stage_instruction}"""
+
+        else:
+            # MongoDB match failed. Fall back to ChromaDB.
+            print(f"DEBUG - MongoDB match failed for title: '{selected_prompt_title}'")
+            docs = get_retriever().invoke(body.question)
+            context = "\n".join([doc.page_content for doc in docs])
+    else:
+        # No prompt selected yet. Run normal ChromaDB search.
+        docs = get_retriever().invoke(body.question)
+        context = "\n".join([doc.page_content for doc in docs])
+
+    # Build conversation history text from previous messages.
     history_text = ""
     for message in body.history:
         role = message.get("role", "")
@@ -210,7 +337,7 @@ def ask(body: Question):
             history_text += f"User: {content}\n"
         elif role == "assistant":
             history_text += f"Assistant: {content}\n"
-    
+
     full_context = f"""
 Previous conversation:
 {history_text}
@@ -218,7 +345,7 @@ Previous conversation:
 Knowledge base context:
 {context}
 """
-    
+
     try:
         response = chain.invoke({
             "question": body.question,
@@ -228,11 +355,9 @@ Knowledge base context:
 
     except Exception as e:
         error_message = str(e)
-        
         if "rate_limit" in error_message:
             return {"answer": "I am currently at capacity. Please try again in a few minutes."}
-        
-        return {"answer": "Something went wrong. Please try again."}
+        return {"answer": "Something went wrong. Please try again."}    
     # Endpoint to save a conversation message to MongoDB.
 # Receives session_id, user_message and bot_response.
 # Pushes both messages into the messages array for that session.
