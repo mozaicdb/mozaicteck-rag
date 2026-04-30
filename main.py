@@ -375,3 +375,18 @@ def save_conversation(body: ConversationMessage):
         return {"status": "saved"}
     except Exception as e:
         return {"status": "error", "detail": str(e)}
+    # Endpoint to retrieve all conversations for a session from MongoDB.
+# Receives session_id as a URL parameter.
+# Returns all messages stored for that session.
+@app.get("/conversations/{session_id}")
+def get_conversation(session_id: str):
+    try:
+        conversation = conversations_collection.find_one(
+            {"session_id": session_id},
+            {"_id": 0}
+        )
+        if not conversation:
+            return {"session_id": session_id, "messages": []}
+        return conversation
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
