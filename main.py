@@ -37,6 +37,7 @@ def get_retriever():
         )
         retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
     return retriever
+
 # Sync function — reads all prompts from MongoDB and reloads ChromaDB fresh.
 # This runs every time the server starts to keep ChromaDB up to date.
 def sync_chroma_from_mongodb():
@@ -122,15 +123,25 @@ STRICT RULES - NEVER BREAK THESE:
       again. Do not recap previous answers. Just ask the next stage question
       directly and warmly. Keep the conversation flowing naturally.
    l. NEVER trigger Rule 7 when a stage collection is already in progress.
-      If the user is answering stage questions, their answers are always in scope.
-      Only trigger Rule 7 if the user asks something completely unrelated before
-      any prompt has been selected.
+   Once a prompt has been introduced and stage questions have started,
+   EVERY user message is treated as a stage answer, no exceptions.
+   It does not matter what the user says. Accept it as their answer and
+   move to the next stage question.
+   Only trigger Rule 7 if no prompt has been selected yet and the user
+   asks something completely outside the prompt categories.
    m. If at any point the user feels the prompt is limited to a specific
-      language, tool, or topic based on their own previous answer,
-      clarify warmly like this:
-      "The prompt I built was based on your answer. You are not limited
-      to any language or tool. Just tell me what you are working with
-      and I will build a brand new prompt around that for you."
+   language, tool, or topic based on their own previous answer,
+   clarify warmly like this:
+   "The prompt I built was based on your answer. You are not limited
+   to any language or tool. Just tell me what you are working with
+   and I will build a brand new prompt around that for you."
+   n. If the user asks what any stage question means, or seems confused by it,
+   do NOT trigger Rule 7. Instead:
+   - Explain what the question means in one or two simple plain English sentences.
+   - Use a practical example to make it clear.
+   - Then ask the same stage question again warmly.
+   Never trigger Rule 7 for any clarification or confusion during stage collection.
+   Always treat confusion as part of the stage conversation.
 6. FOLLOW-UP RULE:
    If the user sends a follow-up request referring to a previous answer
    such as "make it shorter", "can you explain more", "tell me more",
@@ -138,12 +149,16 @@ STRICT RULES - NEVER BREAK THESE:
    or similar - use the previous answer from conversation history to respond.
    Do NOT check the context for these. Do NOT treat them as out of scope.
    NEVER trigger Rule 7 for follow-up questions.
-7. If the answer is NOT in the context below - respond with EXACTLY this and nothing else:
+7. If the answer is NOT in the context below AND no stage collection is currently
+   in progress - respond with EXACTLY this and nothing else:
    "I am sorry, that topic is outside what I currently cover.
    MozaicTeck Prompt Library specializes in AI prompts for writers,
    designers, coders, entrepreneurs and content creators.
    Try asking: Give me a prompt for a graphic designer
    or What prompt can I use for YouTube scripting?"
+   NEVER trigger this rule if a prompt has already been introduced and
+   stage questions have started. In that case, always treat the user
+   message as a stage answer.                                       
 8. If the user sends any greeting such as "hello", "hi", "hlo",
    "good morning", "good afternoon", "good evening", "hey" or similar -
    respond warmly with:
@@ -185,6 +200,7 @@ chain = prompt | llm | StrOutputParser()
 class Question(BaseModel):
     question: str
     history: list = []
+
 # Model for saving a conversation message to MongoDB.
 # Stores the session id, the user message, and the bot response together.
 class ConversationMessage(BaseModel):
@@ -195,11 +211,12 @@ class ConversationMessage(BaseModel):
 # PART 4 — Open the restaurant doors!
 app = FastAPI()
 
-# Startup event — automatically runs sync_chroma_from_mongodb 
+# Startup event — automatically runs sync_chroma_from_mongodb
 # every time the FastAPI server starts.
 @app.on_event("startup")
 async def startup_event():
     sync_chroma_from_mongodb()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -210,7 +227,8 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {"message": "🤖 MozaicTeck RAG API is running!"}
-#start endpoint for fetching prompts by category from monogodb
+
+# Start endpoint for fetching prompts by category from MongoDB
 @app.get("/prompts")
 def get_prompts(category: str = None):
     query = {}
@@ -218,16 +236,14 @@ def get_prompts(category: str = None):
         query["category_label"] = category
     results = list(prompts_collection.find(query, {"_id": 0}))
     return {"prompts": results}
-##end of prompts endpoint
-#start endpoint for fetching all unique categories from mongodb
+
+# Start endpoint for fetching all unique categories from MongoDB
 @app.get("/prompts/categories")
 def get_categories():
-    # Uses MongoDB distinct to return only unique category_label values.
-    # More efficient than fetching all 120 prompts just to read category names.
     categories = prompts_collection.distinct("category_label")
     return {"categories": sorted(categories)}
-#end of categories endpoint
-#start endpoint for searching prompts by keyword from mongodb
+
+# Start endpoint for searching prompts by keyword from MongoDB
 @app.get("/prompts/search")
 def search_prompts(q: str):
     results = list(prompts_collection.find(
@@ -238,11 +254,10 @@ def search_prompts(q: str):
         {"_id": 0}
     ))
     return {"prompts": results}
-#end of search endpoint
+
 @app.post("/ask")
 def ask(body: Question):
     # Scan all assistant messages in history to find a selected prompt title.
-    # We check every assistant message to find the one that introduced a prompt.
     selected_prompt_title = None
     prompt_introduction_index = None
 
@@ -252,25 +267,17 @@ def ask(body: Question):
             if "I found the perfect prompt for you. It is called" in content:
                 start = content.index("It is called") + len("It is called")
                 title = content[start:].strip()
-                # Remove all types of quotes including escaped ones
                 title = title.replace('\\"', '').replace('"', '').replace("'", '')
-                # Remove anything after a newline
                 if "\n" in title:
                     title = title.split("\n")[0].strip()
-                # Remove anything after a period followed by whitespace
                 import re
                 title = re.split(r'\.\s', title)[0].strip()
-                # Remove trailing punctuation
                 title = title.rstrip(".,!?\"'\\")
                 selected_prompt_title = title
-                print(f"DEBUG - Extracted title: '{selected_prompt_title}'")
                 prompt_introduction_index = i
                 break
 
-    # Build context based on whether a prompt is already selected or not.
     if selected_prompt_title and prompt_introduction_index is not None:
-        # Fetch the selected prompt directly from MongoDB by title.
-        # This prevents ChromaDB from pulling a different prompt mid-conversation.
         matched = prompts_collection.find_one(
             {"title": {"$regex": selected_prompt_title, "$options": "i"}},
             {"_id": 0}
@@ -279,31 +286,26 @@ def ask(body: Question):
             stages = matched.get("stages", [])
             total_stages = len(stages)
 
-            # Count how many user answers have been collected
-            # after the prompt was introduced.
             user_answers_after_intro = []
             for message in body.history[prompt_introduction_index + 1:]:
                 if message.get("role") == "user":
                     user_answers_after_intro.append(message.get("content", ""))
 
-            # Add 1 to include the current user message being sent now.
             answers_collected = len(user_answers_after_intro) + 1
 
-            # Build the stages text with numbers for clarity.
             stages_text = "\n".join([f"{i+1}. {s}" for i, s in enumerate(stages)])
+            next_stage = ""
 
-            # Decide what instruction to give the LLM.
             if answers_collected >= total_stages:
-                # All stages answered. Tell LLM to generate the final prompt now.
                 all_answers = user_answers_after_intro + [body.question]
                 stage_instruction = f"""ALL STAGES ARE COMPLETE. DO NOT ASK ANY MORE QUESTIONS. DO NOT RE-INTRODUCE THE PROMPT NAME. DO NOT REPEAT ANY STAGE QUESTIONS.
 Go straight to generating the final prompt. Start your response with "Here is your ready-to-use prompt:" and nothing else before it.
 User answers in order: {all_answers}
 After the generated prompt add the usage instruction."""
             else:
-                # Tell LLM exactly which stage to ask next.
-                next_stage = stages[answers_collected - 1]
-                stage_instruction = f"""Stages answered so far: {answers_collected} out of {total_stages}.
+                stage_instruction = f"""STAGE COLLECTION IS ACTIVE. Rule 7 is DISABLED. Do NOT trigger Rule 7 for any reason.
+Treat ALL user messages as stage answers, no exceptions.
+Stages answered so far: {answers_collected} out of {total_stages}.
 The next stage question to ask is: {next_stage}
 Ask ONLY this question. Nothing else. Do not re-introduce the prompt name."""
 
@@ -319,16 +321,12 @@ Current instruction:
 {stage_instruction}"""
 
         else:
-            # MongoDB match failed. Fall back to ChromaDB.
-            print(f"DEBUG - MongoDB match failed for title: '{selected_prompt_title}'")
             docs = get_retriever().invoke(body.question)
             context = "\n".join([doc.page_content for doc in docs])
     else:
-        # No prompt selected yet. Run normal ChromaDB search.
         docs = get_retriever().invoke(body.question)
         context = "\n".join([doc.page_content for doc in docs])
 
-    # Build conversation history text from previous messages.
     history_text = ""
     for message in body.history:
         role = message.get("role", "")
@@ -357,10 +355,9 @@ Knowledge base context:
         error_message = str(e)
         if "rate_limit" in error_message:
             return {"answer": "I am currently at capacity. Please try again in a few minutes."}
-        return {"answer": "Something went wrong. Please try again."}    
-    # Endpoint to save a conversation message to MongoDB.
-# Receives session_id, user_message and bot_response.
-# Pushes both messages into the messages array for that session.
+        return {"answer": "Something went wrong. Please try again."}
+
+# Endpoint to save a conversation message to MongoDB.
 @app.post("/conversations/save")
 def save_conversation(body: ConversationMessage):
     try:
@@ -375,9 +372,8 @@ def save_conversation(body: ConversationMessage):
         return {"status": "saved"}
     except Exception as e:
         return {"status": "error", "detail": str(e)}
-    # Endpoint to retrieve all conversations for a session from MongoDB.
-# Receives session_id as a URL parameter.
-# Returns all messages stored for that session.
+
+# Endpoint to retrieve all conversations for a session from MongoDB.
 @app.get("/conversations/{session_id}")
 def get_conversation(session_id: str):
     try:
