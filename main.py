@@ -14,6 +14,8 @@ prompts_collection = db["prompts"]
 conversations_collection = db["conversations"]
 
 from fastapi import FastAPI
+# Import the auth router from auth.py to keep authentication logic separate and clean
+from auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -210,6 +212,8 @@ class ConversationMessage(BaseModel):
 
 # PART 4 — Open the restaurant doors!
 app = FastAPI()
+# Register the auth router so all /auth endpoints are active in the app
+app.include_router(auth_router)
 
 # Startup event — automatically runs sync_chroma_from_mongodb
 # every time the FastAPI server starts.
