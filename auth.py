@@ -449,7 +449,7 @@ def forgot_password(body: ForgotPasswordRequest):
 
             resend.Emails.send({
                 "from": "MozaicTeck <onboarding@resend.dev>",
-                "to": body.email,
+                "to": [body.email],
                 "subject": "Reset your MozaicTeck password",
                 "html": f"""
                     <h2>Password Reset Request</h2>
