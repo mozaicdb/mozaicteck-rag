@@ -163,7 +163,7 @@ def register(body: RegisterRequest, response: Response):
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail="Something went wrong during registration. Please try again."
         )
     # -------------------- VERIFY EMAIL ENDPOINT --------------------
 
