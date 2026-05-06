@@ -163,8 +163,8 @@ def register(body: RegisterRequest, response: Response):
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail="Something went wrong during registration. Please try again."
-        )    
+            detail=str(e)
+        )
     # -------------------- VERIFY EMAIL ENDPOINT --------------------
 
 @router.get("/verify-email")
