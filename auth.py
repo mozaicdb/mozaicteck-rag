@@ -1,5 +1,6 @@
 import os
-import resend
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException, Response, Request, Depends
 from pydantic import BaseModel, EmailStr
@@ -134,15 +135,16 @@ def register(body: RegisterRequest, response: Response):
             "used": False
         })
 
-        # Step 7 - Send verification email using Resend
-        resend.api_key = os.environ["RESEND_API_KEY"]
+        # Step 7 - Send verification email using Brevo
         verification_link = f"{os.environ['FRONTEND_URL']}/verify-email?token={verification_token}"
-        
-        resend.Emails.send({
-            "from": "MozaicTeck <onboarding@resend.dev>",
-            "to": body.email,
-            "subject": "Verify your MozaicTeck account",
-            "html": f"""
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = os.environ["BREVO_API_KEY"]
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": body.email, "name": body.firstName}],
+            sender={"name": "MozaicTeck", "email": os.environ["BREVO_SENDER_EMAIL"]},
+            subject="Verify your MozaicTeck account",
+            html_content=f"""
                 <h2>Welcome to MozaicTeck, {body.firstName}!</h2>
                 <p>Thank you for registering. Please click the link below to verify your email address.</p>
                 <a href="{verification_link}" style="background-color:#E8650A;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;">
@@ -151,7 +153,8 @@ def register(body: RegisterRequest, response: Response):
                 <p>This link expires in 24 hours.</p>
                 <p>If you did not create this account, please ignore this email.</p>
             """
-        })
+        )
+        api_instance.send_transac_email(send_smtp_email)
 
         # Step 8 - Return success message
         return {
@@ -444,26 +447,28 @@ def forgot_password(body: ForgotPasswordRequest):
             })
 
             # Send reset email
-            resend.api_key = os.environ["RESEND_API_KEY"]
             reset_link = f"{os.environ['FRONTEND_URL']}/reset-password?token={reset_token}"
-
-            resend.Emails.send({
-                "from": "MozaicTeck <onboarding@resend.dev>",
-                "to": [body.email],
-                "subject": "Reset your MozaicTeck password",
-                "html": f"""
+            configuration = sib_api_v3_sdk.Configuration()
+            configuration.api_key['api-key'] = os.environ["BREVO_API_KEY"]
+            api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                to=[{"email": body.email, "name": user['firstName']}],
+                sender={"name": "MozaicTeck", "email": os.environ["BREVO_SENDER_EMAIL"]},
+                subject="Reset your MozaicTeck password",
+                html_content=f"""
                     <h2>Password Reset Request</h2>
                     <p>Hi {user['firstName']},</p>
-                    <p>We received a request to reset your password. 
+                    <p>We received a request to reset your password.
                     Click the button below to create a new password.</p>
                     <a href="{reset_link}" style="background-color:#E8650A;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;">
                         Reset My Password
                     </a>
                     <p>This link expires in 15 minutes.</p>
-                    <p>If you did not request a password reset, 
+                    <p>If you did not request a password reset,
                     please ignore this email. Your password will not change.</p>
                 """
-            })
+            )
+            api_instance.send_transac_email(send_smtp_email)
 
         # Step 3 - Always return the same message regardless
         return {
