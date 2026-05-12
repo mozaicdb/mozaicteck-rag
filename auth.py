@@ -276,7 +276,7 @@ def login(body: LoginRequest, response: Response):
             key="access_token",
             value=access_token,
             httponly=True,
-            samesite="lax",
+            samesite="none",
             secure=True,
             max_age=15 * 60
         )
