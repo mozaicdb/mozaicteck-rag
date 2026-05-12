@@ -14,7 +14,6 @@ prompts_collection = db["prompts"]
 conversations_collection = db["conversations"]
 
 from fastapi import FastAPI
-# Import the auth router from auth.py to keep authentication logic separate and clean
 from auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -40,26 +39,20 @@ def get_retriever():
         retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
     return retriever
 
-# Sync function — reads all prompts from MongoDB and reloads ChromaDB fresh.
-# This runs every time the server starts to keep ChromaDB up to date.
 def sync_chroma_from_mongodb():
     print("Starting ChromaDB sync from MongoDB...")
 
-    # Step 1: Read all 120 prompts from MongoDB
     all_prompts = list(prompts_collection.find({}, {"_id": 0}))
     print(f"Found {len(all_prompts)} prompts in MongoDB")
 
-    # Step 2: Convert each prompt into a single text string
     documents = []
     for p in all_prompts:
         stages_text = " ".join(p.get("stages", []))
         text = f"Title: {p.get('title', '')}\nDescription: {p.get('description', '')}\nCategory: {p.get('category_label', '')}\nStages: {stages_text}"
         documents.append(text)
 
-    # Step 3: Load embeddings
     emb = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-    # Step 4: Delete old ChromaDB collection completely then reload fresh
     old_store = Chroma(
         persist_directory="./chroma_db",
         embedding_function=emb
@@ -67,7 +60,6 @@ def sync_chroma_from_mongodb():
     old_store.delete_collection()
     print("Old ChromaDB collection deleted.")
 
-    # Step 5: Reload ChromaDB with fresh 120 prompts from MongoDB
     Chroma.from_texts(
         texts=documents,
         embedding=emb,
@@ -160,7 +152,7 @@ STRICT RULES - NEVER BREAK THESE:
    or What prompt can I use for YouTube scripting?"
    NEVER trigger this rule if a prompt has already been introduced and
    stage questions have started. In that case, always treat the user
-   message as a stage answer.                                       
+   message as a stage answer.
 8. If the user sends any greeting such as "hello", "hi", "hlo",
    "good morning", "good afternoon", "good evening", "hey" or similar -
    respond warmly with:
@@ -198,13 +190,10 @@ Question: {question}
 """)
 chain = prompt | llm | StrOutputParser()
 
-# PART 3 — The order form
 class Question(BaseModel):
     question: str
     history: list = []
 
-# Model for saving a conversation message to MongoDB.
-# Stores the session id, the user message, and the bot response together.
 class ConversationMessage(BaseModel):
     session_id: str
     user_message: str
@@ -212,27 +201,27 @@ class ConversationMessage(BaseModel):
 
 # PART 4 — Open the restaurant doors!
 app = FastAPI()
-# Register the auth router so all /auth endpoints are active in the app
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "https://mozaicdb.github.io"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(auth_router)
 
-# Startup event — automatically runs sync_chroma_from_mongodb
-# every time the FastAPI server starts.
 @app.on_event("startup")
 async def startup_event():
     sync_chroma_from_mongodb()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 @app.get("/")
 def home():
-    return {"message": "🤖 MozaicTeck RAG API is running!"}
+    return {"message": "MozaicTeck RAG API is running!"}
 
-# Start endpoint for fetching prompts by category from MongoDB
 @app.get("/prompts")
 def get_prompts(category: str = None):
     query = {}
@@ -241,13 +230,11 @@ def get_prompts(category: str = None):
     results = list(prompts_collection.find(query, {"_id": 0}))
     return {"prompts": results}
 
-# Start endpoint for fetching all unique categories from MongoDB
 @app.get("/prompts/categories")
 def get_categories():
     categories = prompts_collection.distinct("category_label")
     return {"categories": sorted(categories)}
 
-# Start endpoint for searching prompts by keyword from MongoDB
 @app.get("/prompts/search")
 def search_prompts(q: str):
     results = list(prompts_collection.find(
@@ -261,7 +248,6 @@ def search_prompts(q: str):
 
 @app.post("/ask")
 def ask(body: Question):
-    # Scan all assistant messages in history to find a selected prompt title.
     selected_prompt_title = None
     prompt_introduction_index = None
 
@@ -361,7 +347,6 @@ Knowledge base context:
             return {"answer": "I am currently at capacity. Please try again in a few minutes."}
         return {"answer": "Something went wrong. Please try again."}
 
-# Endpoint to save a conversation message to MongoDB.
 @app.post("/conversations/save")
 def save_conversation(body: ConversationMessage):
     try:
@@ -377,7 +362,6 @@ def save_conversation(body: ConversationMessage):
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
-# Endpoint to retrieve all conversations for a session from MongoDB.
 @app.get("/conversations/{session_id}")
 def get_conversation(session_id: str):
     try:

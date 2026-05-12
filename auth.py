@@ -33,14 +33,12 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 # -------------------- HELPER FUNCTIONS --------------------
 
-# Password helpers
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-# Password validation rules
 def validate_password(password: str):
     if len(password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
@@ -53,7 +51,6 @@ def validate_password(password: str):
     if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
         raise HTTPException(status_code=400, detail="Password must contain at least one special character")
 
-# Token helpers
 def create_access_token(user_id: str) -> str:
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": user_id, "exp": expire, "type": "access"}
@@ -64,7 +61,6 @@ def create_refresh_token(user_id: str) -> str:
     payload = {"sub": user_id, "exp": expire, "type": "refresh"}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-# Token verification
 def verify_token(token: str, token_type: str) -> str:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -76,8 +72,8 @@ def verify_token(token: str, token_type: str) -> str:
         return user_id
     except JWTError:
         raise HTTPException(status_code=401, detail="Token is invalid or expired")
-    
-    # -------------------- REQUEST MODELS --------------------
+
+# -------------------- REQUEST MODELS --------------------
 
 class RegisterRequest(BaseModel):
     firstName: str
@@ -91,10 +87,8 @@ class RegisterRequest(BaseModel):
 @router.post("/register")
 def register(body: RegisterRequest, response: Response):
     try:
-        # Step 1 - Validate password rules
         validate_password(body.password)
 
-        # Step 2 - Check if email already exists
         existing_user = users_collection.find_one({"email": body.email})
         if existing_user:
             raise HTTPException(
@@ -102,32 +96,28 @@ def register(body: RegisterRequest, response: Response):
                 detail="This email is already registered. Please login instead."
             )
 
-        # Step 3 - Hash the password
         hashed_password = hash_password(body.password)
 
-        # Step 4 - Save new user to MongoDB
         new_user = {
-    "firstName": body.firstName,
-    "lastName": body.lastName,
-    "email": body.email,
-    "phoneNumber": body.phoneNumber,
-    "passwordHash": hashed_password,
-    "bio": "",
-    "isEmailVerified": False,
-    "isTwoFAEnabled": False,
-    "twoFAMethod": "email",
-    "failedLoginAttempts": 0,
-    "lockUntil": None,
-    "createdAt": datetime.utcnow()
-}
-        
+            "firstName": body.firstName,
+            "lastName": body.lastName,
+            "email": body.email,
+            "phoneNumber": body.phoneNumber,
+            "passwordHash": hashed_password,
+            "bio": "",
+            "isEmailVerified": False,
+            "isTwoFAEnabled": False,
+            "twoFAMethod": "email",
+            "failedLoginAttempts": 0,
+            "lockUntil": None,
+            "createdAt": datetime.utcnow()
+        }
+
         result = users_collection.insert_one(new_user)
         user_id = str(result.inserted_id)
 
-        # Step 5 - Generate verification token
         verification_token = secrets.token_urlsafe(32)
 
-        # Step 6 - Save token to MongoDB with 24 hour expiry
         verification_tokens_collection.insert_one({
             "userId": user_id,
             "token": verification_token,
@@ -135,7 +125,6 @@ def register(body: RegisterRequest, response: Response):
             "used": False
         })
 
-        # Step 7 - Send verification email using Brevo
         verification_link = f"{os.environ['FRONTEND_URL']}/verify-email?token={verification_token}"
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = os.environ["BREVO_API_KEY"]
@@ -156,60 +145,53 @@ def register(body: RegisterRequest, response: Response):
         )
         api_instance.send_transac_email(send_smtp_email)
 
-        # Step 8 - Return success message
         return {
             "message": "Registration successful. Please check your email to verify your account."
         }
 
     except HTTPException:
         raise
-   except Exception as e:
+    except Exception as e:
         raise HTTPException(
             status_code=500,
             detail="Something went wrong during registration. Please try again."
         )
-    # -------------------- VERIFY EMAIL ENDPOINT --------------------
+
+# -------------------- VERIFY EMAIL ENDPOINT --------------------
 
 @router.get("/verify-email")
 def verify_email(token: str):
     try:
-        # Step 1 - Find the token in MongoDB
         token_record = verification_tokens_collection.find_one({"token": token})
-        
-        # Step 2 - Check if token exists
+
         if not token_record:
             raise HTTPException(
                 status_code=400,
                 detail="Invalid verification link. Please register again."
             )
-        
-        # Step 3 - Check if token has already been used
+
         if token_record["used"]:
             raise HTTPException(
                 status_code=400,
                 detail="This verification link has already been used. Please login."
             )
-        
-        # Step 4 - Check if token has expired
+
         if datetime.utcnow() > token_record["expiresAt"]:
             raise HTTPException(
                 status_code=400,
                 detail="This verification link has expired. Please register again."
             )
-        
-        # Step 5 - Mark user as verified in MongoDB
+
         users_collection.update_one(
             {"_id": ObjectId(token_record["userId"])},
             {"$set": {"isEmailVerified": True}}
         )
-        
-        # Step 6 - Mark token as used
+
         verification_tokens_collection.update_one(
             {"token": token},
             {"$set": {"used": True}}
         )
-        
-        # Step 7 - Return success message
+
         return {
             "message": "Email verified successfully. You can now login to your account."
         }
@@ -221,8 +203,8 @@ def verify_email(token: str):
             status_code=500,
             detail="Something went wrong during verification. Please try again."
         )
-    
-    # -------------------- REQUEST MODELS --------------------
+
+# -------------------- REQUEST MODELS --------------------
 
 class LoginRequest(BaseModel):
     email: EmailStr
@@ -233,7 +215,6 @@ class LoginRequest(BaseModel):
 @router.post("/login")
 def login(body: LoginRequest, response: Response):
     try:
-        # Step 1 - Find user by email
         user = users_collection.find_one({"email": body.email})
         if not user:
             raise HTTPException(
@@ -241,7 +222,6 @@ def login(body: LoginRequest, response: Response):
                 detail="Invalid email or password."
             )
 
-        # Step 2 - Check if account is locked
         if user.get("lockUntil") and datetime.utcnow() < user["lockUntil"]:
             remaining = int((user["lockUntil"] - datetime.utcnow()).total_seconds())
             raise HTTPException(
@@ -249,20 +229,16 @@ def login(body: LoginRequest, response: Response):
                 detail=f"Account temporarily locked. Please try again in {remaining} seconds."
             )
 
-        # Step 3 - Check if email is verified
         if not user["isEmailVerified"]:
             raise HTTPException(
                 status_code=401,
                 detail="Please verify your email address before logging in."
             )
 
-        # Step 4 - Verify password
         if not verify_password(body.password, user["passwordHash"]):
-            # Increment failed attempts
             failed_attempts = user.get("failedLoginAttempts", 0) + 1
-            
+
             if failed_attempts >= 5:
-                # Lock the account for 60 seconds
                 users_collection.update_one(
                     {"email": body.email},
                     {"$set": {
@@ -275,7 +251,6 @@ def login(body: LoginRequest, response: Response):
                     detail="Too many failed attempts. Account locked for 60 seconds."
                 )
             else:
-                # Update failed attempts count
                 users_collection.update_one(
                     {"email": body.email},
                     {"$set": {"failedLoginAttempts": failed_attempts}}
@@ -285,7 +260,6 @@ def login(body: LoginRequest, response: Response):
                     detail=f"Invalid email or password. {5 - failed_attempts} attempts remaining."
                 )
 
-        # Step 5 - Reset failed attempts on successful login
         users_collection.update_one(
             {"email": body.email},
             {"$set": {
@@ -294,12 +268,10 @@ def login(body: LoginRequest, response: Response):
             }}
         )
 
-        # Step 6 - Create tokens
         user_id = str(user["_id"])
         access_token = create_access_token(user_id)
         refresh_token = create_refresh_token(user_id)
 
-        # Step 7 - Set tokens in httpOnly cookies with SameSite protection
         response.set_cookie(
             key="access_token",
             value=access_token,
@@ -317,7 +289,6 @@ def login(body: LoginRequest, response: Response):
             max_age=7 * 24 * 60 * 60
         )
 
-        # Step 8 - Return success with user details
         return {
             "message": "Login successful.",
             "user": {
@@ -334,13 +305,12 @@ def login(body: LoginRequest, response: Response):
             status_code=500,
             detail="Something went wrong during login. Please try again."
         )
-    
-    # -------------------- LOGOUT ENDPOINT --------------------
+
+# -------------------- LOGOUT ENDPOINT --------------------
 
 @router.post("/logout")
 def logout(response: Response):
     try:
-        # Step 1 - Clear the access token cookie
         response.delete_cookie(
             key="access_token",
             httponly=True,
@@ -348,7 +318,6 @@ def logout(response: Response):
             secure=True
         )
 
-        # Step 2 - Clear the refresh token cookie
         response.delete_cookie(
             key="refresh_token",
             httponly=True,
@@ -356,7 +325,6 @@ def logout(response: Response):
             secure=True
         )
 
-        # Step 3 - Return success message
         return {
             "message": "Logged out successfully."
         }
@@ -368,13 +336,12 @@ def logout(response: Response):
             status_code=500,
             detail="Something went wrong during logout. Please try again."
         )
-    
-    # -------------------- REFRESH TOKEN ENDPOINT --------------------
+
+# -------------------- REFRESH TOKEN ENDPOINT --------------------
 
 @router.post("/refresh")
 def refresh_token(request: Request, response: Response):
     try:
-        # Step 1 - Get refresh token from cookie
         token = request.cookies.get("refresh_token")
         if not token:
             raise HTTPException(
@@ -382,10 +349,8 @@ def refresh_token(request: Request, response: Response):
                 detail="No refresh token found. Please login again."
             )
 
-        # Step 2 - Verify the refresh token
         user_id = verify_token(token, "refresh")
 
-        # Step 3 - Check if user still exists in MongoDB
         user = users_collection.find_one({"_id": ObjectId(user_id)})
         if not user:
             raise HTTPException(
@@ -393,10 +358,8 @@ def refresh_token(request: Request, response: Response):
                 detail="User no longer exists. Please login again."
             )
 
-        # Step 4 - Create a new access token
         new_access_token = create_access_token(user_id)
 
-        # Step 5 - Set the new access token in httpOnly cookie
         response.set_cookie(
             key="access_token",
             value=new_access_token,
@@ -406,7 +369,6 @@ def refresh_token(request: Request, response: Response):
             max_age=15 * 60
         )
 
-        # Step 6 - Return success
         return {
             "message": "Token refreshed successfully."
         }
@@ -418,8 +380,8 @@ def refresh_token(request: Request, response: Response):
             status_code=500,
             detail="Something went wrong. Please login again."
         )
-    
-    # -------------------- REQUEST MODELS --------------------
+
+# -------------------- REQUEST MODELS --------------------
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
@@ -429,15 +391,11 @@ class ForgotPasswordRequest(BaseModel):
 @router.post("/forgot-password")
 def forgot_password(body: ForgotPasswordRequest):
     try:
-        # Step 1 - Check if email exists in MongoDB
         user = users_collection.find_one({"email": body.email})
 
-        # Step 2 - If user exists generate and send reset token
         if user:
-            # Generate reset token
             reset_token = secrets.token_urlsafe(32)
 
-            # Save token to MongoDB with 15 minute expiry
             verification_tokens_collection.insert_one({
                 "userId": str(user["_id"]),
                 "token": reset_token,
@@ -446,7 +404,6 @@ def forgot_password(body: ForgotPasswordRequest):
                 "used": False
             })
 
-            # Send reset email
             reset_link = f"{os.environ['FRONTEND_URL']}/reset-password?token={reset_token}"
             configuration = sib_api_v3_sdk.Configuration()
             configuration.api_key['api-key'] = os.environ["BREVO_API_KEY"]
@@ -470,7 +427,6 @@ def forgot_password(body: ForgotPasswordRequest):
             )
             api_instance.send_transac_email(send_smtp_email)
 
-        # Step 3 - Always return the same message regardless
         return {
             "message": "If this email is registered you will receive a password reset link shortly."
         }
@@ -482,8 +438,8 @@ def forgot_password(body: ForgotPasswordRequest):
             status_code=500,
             detail="Something went wrong. Please try again."
         )
-    
-    # -------------------- REQUEST MODELS --------------------
+
+# -------------------- REQUEST MODELS --------------------
 
 class ResetPasswordRequest(BaseModel):
     token: str
@@ -494,40 +450,33 @@ class ResetPasswordRequest(BaseModel):
 @router.post("/reset-password")
 def reset_password(body: ResetPasswordRequest):
     try:
-        # Step 1 - Find the reset token in MongoDB
         token_record = verification_tokens_collection.find_one({
             "token": body.token,
             "type": "password_reset"
         })
 
-        # Step 2 - Check if token exists
         if not token_record:
             raise HTTPException(
                 status_code=400,
                 detail="Invalid reset link. Please request a new one."
             )
 
-        # Step 3 - Check if token has already been used
         if token_record["used"]:
             raise HTTPException(
                 status_code=400,
                 detail="This reset link has already been used. Please request a new one."
             )
 
-        # Step 4 - Check if token has expired
         if datetime.utcnow() > token_record["expiresAt"]:
             raise HTTPException(
                 status_code=400,
                 detail="This reset link has expired. Please request a new one."
             )
 
-        # Step 5 - Validate new password against the 5 rules
         validate_password(body.new_password)
 
-        # Step 6 - Hash the new password
         new_hashed_password = hash_password(body.new_password)
 
-        # Step 7 - Update the user's password in MongoDB
         users_collection.update_one(
             {"_id": ObjectId(token_record["userId"])},
             {"$set": {
@@ -537,13 +486,11 @@ def reset_password(body: ResetPasswordRequest):
             }}
         )
 
-        # Step 8 - Mark token as used
         verification_tokens_collection.update_one(
             {"token": body.token},
             {"$set": {"used": True}}
         )
 
-        # Step 9 - Return success message
         return {
             "message": "Password reset successful. You can now login with your new password."
         }
@@ -556,12 +503,11 @@ def reset_password(body: ResetPasswordRequest):
             detail="Something went wrong. Please try again."
         )
 
-        # -------------------- GET CURRENT USER ENDPOINT --------------------
+# -------------------- GET CURRENT USER ENDPOINT --------------------
 
 @router.get("/me")
 def get_current_user(request: Request):
     try:
-        # Step 1 - Get access token from cookie
         token = request.cookies.get("access_token")
         if not token:
             raise HTTPException(
@@ -569,10 +515,8 @@ def get_current_user(request: Request):
                 detail="Not authenticated. Please login."
             )
 
-        # Step 2 - Verify the access token
         user_id = verify_token(token, "access")
 
-        # Step 3 - Find user in MongoDB
         user = users_collection.find_one({"_id": ObjectId(user_id)})
         if not user:
             raise HTTPException(
@@ -580,7 +524,6 @@ def get_current_user(request: Request):
                 detail="User not found. Please login again."
             )
 
-        # Step 4 - Return user details
         return {
             "user": {
                 "id": str(user["_id"]),
