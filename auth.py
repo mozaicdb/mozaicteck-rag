@@ -314,7 +314,7 @@ def logout(response: Response):
         response.delete_cookie(
             key="access_token",
             httponly=True,
-            samesite="lax",
+            samesite="none",
             secure=True
         )
 
