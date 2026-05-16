@@ -576,9 +576,11 @@ def google_login():
         scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
     )
     flow.redirect_uri = GOOGLE_REDIRECT_URI
-    authorization_url, state = flow.authorization_url(prompt="consent")
+    authorization_url, state = flow.authorization_url(
+        prompt="consent",
+        code_challenge_method=None
+    )
     return {"url": authorization_url}
-
 
 @router.get("/google/callback")
 def google_callback(code: str, response: Response):
@@ -596,7 +598,14 @@ def google_callback(code: str, response: Response):
             scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
         )
         flow.redirect_uri = GOOGLE_REDIRECT_URI
-        flow.fetch_token(code=code)
+
+        import os as _os
+        _os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+        flow.fetch_token(
+            code=code,
+            include_client_id=True
+        )
 
         credentials = flow.credentials
         import requests as req
