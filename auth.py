@@ -9,6 +9,7 @@ from jose import JWTError, jwt
 from pymongo import MongoClient
 from bson import ObjectId
 import secrets
+from google_auth_oauthlib.flow import Flow
 import re
 
 # Database connection
@@ -110,6 +111,7 @@ def register(body: RegisterRequest, response: Response):
             "twoFAMethod": "email",
             "failedLoginAttempts": 0,
             "lockUntil": None,
+            "authProvider": "local",
             "createdAt": datetime.utcnow()
         }
 
@@ -233,6 +235,12 @@ def login(body: LoginRequest, response: Response):
             raise HTTPException(
                 status_code=401,
                 detail="Please verify your email address before logging in."
+            )
+
+        if user.get("authProvider") == "google":
+            raise HTTPException(
+                status_code=400,
+                detail="This account uses Google login. Please click Login with Google instead."
             )
 
         if not verify_password(body.password, user["passwordHash"]):
@@ -530,10 +538,11 @@ def get_current_user(request: Request):
                 "firstName": user["firstName"],
                 "lastName": user["lastName"],
                 "email": user["email"],
-                "phoneNumber": user["phoneNumber"],
-                "bio": user["bio"],
+                "phoneNumber": user.get("phoneNumber", ""),
+                "bio": user.get("bio", ""),
                 "isEmailVerified": user["isEmailVerified"],
                 "isTwoFAEnabled": user["isTwoFAEnabled"],
+                "authProvider": user.get("authProvider", "local"),
                 "createdAt": str(user["createdAt"])
             }
         }
@@ -544,4 +553,119 @@ def get_current_user(request: Request):
         raise HTTPException(
             status_code=500,
             detail="Something went wrong. Please login again."
+        )
+
+# -------------------- GOOGLE OAUTH ENDPOINTS --------------------
+
+GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
+GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
+GOOGLE_REDIRECT_URI = "https://Mozaicteck-mozaicteck-rag.hf.space/auth/google/callback"
+
+@router.get("/google/login")
+def google_login():
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [GOOGLE_REDIRECT_URI]
+            }
+        },
+        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
+    )
+    flow.redirect_uri = GOOGLE_REDIRECT_URI
+    authorization_url, state = flow.authorization_url(prompt="consent")
+    return {"url": authorization_url}
+
+
+@router.get("/google/callback")
+def google_callback(code: str, response: Response):
+    try:
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": GOOGLE_CLIENT_ID,
+                    "client_secret": GOOGLE_CLIENT_SECRET,
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [GOOGLE_REDIRECT_URI]
+                }
+            },
+            scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
+        )
+        flow.redirect_uri = GOOGLE_REDIRECT_URI
+        flow.fetch_token(code=code)
+
+        credentials = flow.credentials
+        import requests as req
+        user_info = req.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {credentials.token}"}
+        ).json()
+
+        email = user_info.get("email")
+        first_name = user_info.get("given_name", "")
+        last_name = user_info.get("family_name", "")
+
+        user = users_collection.find_one({"email": email})
+
+        if not user:
+            new_user = {
+                "firstName": first_name,
+                "lastName": last_name,
+                "email": email,
+                "phoneNumber": "",
+                "passwordHash": None,
+                "bio": "",
+                "isEmailVerified": True,
+                "isTwoFAEnabled": False,
+                "twoFAMethod": "email",
+                "failedLoginAttempts": 0,
+                "lockUntil": None,
+                "authProvider": "google",
+                "createdAt": datetime.utcnow()
+            }
+            result = users_collection.insert_one(new_user)
+            user_id = str(result.inserted_id)
+        else:
+            if user.get("authProvider") == "local":
+                frontend_url = os.environ["FRONTEND_URL"]
+                return Response(
+                    status_code=302,
+                    headers={"Location": f"{frontend_url}/login?error=use_password"}
+                )
+            user_id = str(user["_id"])
+
+        access_token = create_access_token(user_id)
+        refresh_token = create_refresh_token(user_id)
+
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            samesite="none",
+            secure=True,
+            max_age=15 * 60
+        )
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            samesite="lax",
+            secure=True,
+            max_age=7 * 24 * 60 * 60
+        )
+
+        frontend_url = os.environ["FRONTEND_URL"]
+        return Response(
+            status_code=302,
+            headers={"Location": f"{frontend_url}/chatbot"}
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Google login failed. Please try again."
         )
