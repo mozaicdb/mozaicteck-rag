@@ -578,7 +578,7 @@ def google_login():
     flow.redirect_uri = GOOGLE_REDIRECT_URI
     authorization_url, state = flow.authorization_url(
         prompt="consent",
-        code_challenge_method=None
+        access_type="offline"
     )
     return {"url": authorization_url}
 
