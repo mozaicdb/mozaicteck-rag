@@ -667,5 +667,5 @@ def google_callback(code: str, response: Response):
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail="Google login failed. Please try again."
+            detail=f"Google login failed: {str(e)}"
         )
