@@ -2,34 +2,38 @@ import os
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from datetime import datetime, timedelta
-from fastapi import APIRouter, HTTPException, Response, Request, Depends
+from fastapi import APIRouter, HTTPException, Response, Request
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from pymongo import MongoClient
 from bson import ObjectId
 import secrets
-from google_auth_oauthlib.flow import Flow
 import re
 
-# Database connection
+# -------------------- DATABASE CONNECTION --------------------
+# Connects to MongoDB Atlas using the URI stored in environment variables
 mongo_uri = os.environ["MONGO_URI"]
 mongo_client = MongoClient(mongo_uri)
 db = mongo_client["mozaic_db"]
 users_collection = db["users"]
 verification_tokens_collection = db["email_verification_tokens"]
 two_fa_tokens_collection = db["two_fa_tokens"]
+google_session_tokens_collection = db["google_session_tokens"]
 
-# Password hashing setup
+# -------------------- PASSWORD HASHING SETUP --------------------
+# bcrypt is used to hash and verify passwords securely
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# JWT setup
+# -------------------- JWT SETUP --------------------
+# JWT is used to create and verify access and refresh tokens
 SECRET_KEY = os.environ["JWT_SECRET"]
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
-# Router setup
+# -------------------- ROUTER SETUP --------------------
+# All auth endpoints are grouped under the /auth prefix
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 # -------------------- HELPER FUNCTIONS --------------------
@@ -84,6 +88,8 @@ class RegisterRequest(BaseModel):
     password: str
 
 # -------------------- REGISTER ENDPOINT --------------------
+# Creates a new user account, hashes their password,
+# saves to MongoDB, and sends a verification email via Brevo
 
 @router.post("/register")
 def register(body: RegisterRequest, response: Response):
@@ -160,6 +166,8 @@ def register(body: RegisterRequest, response: Response):
         )
 
 # -------------------- VERIFY EMAIL ENDPOINT --------------------
+# Validates the token from the verification email link
+# and marks the user as verified in MongoDB
 
 @router.get("/verify-email")
 def verify_email(token: str):
@@ -213,6 +221,9 @@ class LoginRequest(BaseModel):
     password: str
 
 # -------------------- LOGIN ENDPOINT --------------------
+# Validates email and password, checks for account lock,
+# verifies email, blocks Google accounts from password login,
+# and sets access and refresh token cookies on success
 
 @router.post("/login")
 def login(body: LoginRequest, response: Response):
@@ -315,6 +326,8 @@ def login(body: LoginRequest, response: Response):
         )
 
 # -------------------- LOGOUT ENDPOINT --------------------
+# Deletes the access and refresh token cookies from the browser
+# samesite must match exactly how the cookies were originally set
 
 @router.post("/logout")
 def logout(response: Response):
@@ -346,6 +359,8 @@ def logout(response: Response):
         )
 
 # -------------------- REFRESH TOKEN ENDPOINT --------------------
+# Uses the refresh token cookie to issue a new access token
+# when the current access token has expired
 
 @router.post("/refresh")
 def refresh_token(request: Request, response: Response):
@@ -395,6 +410,8 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 # -------------------- FORGOT PASSWORD ENDPOINT --------------------
+# Sends a password reset link to the user's email via Brevo
+# The link expires in 15 minutes
 
 @router.post("/forgot-password")
 def forgot_password(body: ForgotPasswordRequest):
@@ -454,6 +471,8 @@ class ResetPasswordRequest(BaseModel):
     new_password: str
 
 # -------------------- RESET PASSWORD ENDPOINT --------------------
+# Validates the reset token, checks expiry and usage,
+# hashes and saves the new password, resets failed login attempts
 
 @router.post("/reset-password")
 def reset_password(body: ResetPasswordRequest):
@@ -512,6 +531,8 @@ def reset_password(body: ResetPasswordRequest):
         )
 
 # -------------------- GET CURRENT USER ENDPOINT --------------------
+# Reads the access token cookie, verifies it,
+# and returns the logged in user's data from MongoDB
 
 @router.get("/me")
 def get_current_user(request: Request):
@@ -555,7 +576,9 @@ def get_current_user(request: Request):
             detail="Something went wrong. Please login again."
         )
 
-# -------------------- GOOGLE OAUTH ENDPOINTS --------------------
+# -------------------- GOOGLE OAUTH VARIABLES --------------------
+# These credentials come from Google Cloud Console
+# and are stored securely in environment variables
 
 GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
 GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
@@ -563,6 +586,10 @@ GOOGLE_REDIRECT_URI = "https://Mozaicteck-mozaicteck-rag.hf.space/auth/google/ca
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
+
+# -------------------- GOOGLE LOGIN ENDPOINT --------------------
+# Builds the Google OAuth URL with required parameters
+# and returns it to the frontend which redirects the user there
 
 @router.get("/google/login")
 def google_login():
@@ -579,8 +606,14 @@ def google_login():
     return {"url": auth_url}
 
 
+# -------------------- GOOGLE CALLBACK ENDPOINT --------------------
+# Called automatically by Google after the user approves login.
+# Exchanges the code from Google for user info, creates or finds the user,
+# generates a short-lived one-time token and redirects to the frontend with it.
+# The token is used to set cookies safely across domains.
+
 @router.get("/google/callback")
-def google_callback(code: str, response: Response):
+def google_callback(code: str):
     try:
         import requests as req
 
@@ -600,11 +633,11 @@ def google_callback(code: str, response: Response):
         if "error" in token_data:
             raise Exception(token_data["error"])
 
-        access_token = token_data.get("access_token")
+        google_access_token = token_data.get("access_token")
 
         user_info = req.get(
             GOOGLE_USERINFO_URL,
-            headers={"Authorization": f"Bearer {access_token}"}
+            headers={"Authorization": f"Bearer {google_access_token}"}
         ).json()
 
         email = user_info.get("email")
@@ -632,7 +665,8 @@ def google_callback(code: str, response: Response):
             result = users_collection.insert_one(new_user)
             user_id = str(result.inserted_id)
         else:
-            if user.get("authProvider") == "local":
+            auth_provider = user.get("authProvider", "local")
+            if auth_provider == "local":
                 frontend_url = os.environ["FRONTEND_URL"]
                 return Response(
                     status_code=302,
@@ -640,12 +674,61 @@ def google_callback(code: str, response: Response):
                 )
             user_id = str(user["_id"])
 
-        jwt_access_token = create_access_token(user_id)
-        jwt_refresh_token = create_refresh_token(user_id)
+        gt = secrets.token_urlsafe(32)
+        google_session_tokens_collection.insert_one({
+            "token": gt,
+            "userId": user_id,
+            "expiresAt": datetime.utcnow() + timedelta(minutes=5),
+            "used": False
+        })
+
+        frontend_url = os.environ["FRONTEND_URL"]
+        return Response(
+            status_code=302,
+            headers={"Location": f"{frontend_url}/chatbot?gt={gt}"}
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Google login failed: {str(e)}"
+        )
+
+
+# -------------------- GOOGLE SESSION ENDPOINT --------------------
+# Called by the frontend after Google redirects back with a token in the URL.
+# This endpoint verifies the one-time token, marks it as used,
+# then sets the access and refresh cookies directly in the browser.
+# This solves the cross-domain cookie problem since cookies are set
+# via a direct frontend-to-backend call, not across a redirect.
+
+@router.get("/google/session")
+def google_session(gt: str, response: Response):
+    try:
+        token_record = google_session_tokens_collection.find_one({"token": gt})
+
+        if not token_record:
+            raise HTTPException(status_code=401, detail="Invalid session token.")
+
+        if token_record["used"]:
+            raise HTTPException(status_code=401, detail="Session token already used.")
+
+        if datetime.utcnow() > token_record["expiresAt"]:
+            raise HTTPException(status_code=401, detail="Session token expired.")
+
+        google_session_tokens_collection.update_one(
+            {"token": gt},
+            {"$set": {"used": True}}
+        )
+
+        user_id = token_record["userId"]
+
+        access_token = create_access_token(user_id)
+        refresh_token = create_refresh_token(user_id)
 
         response.set_cookie(
             key="access_token",
-            value=jwt_access_token,
+            value=access_token,
             httponly=True,
             samesite="none",
             secure=True,
@@ -653,21 +736,19 @@ def google_callback(code: str, response: Response):
         )
         response.set_cookie(
             key="refresh_token",
-            value=jwt_refresh_token,
+            value=refresh_token,
             httponly=True,
             samesite="lax",
             secure=True,
             max_age=7 * 24 * 60 * 60
         )
 
-        frontend_url = os.environ["FRONTEND_URL"]
-        return Response(
-            status_code=302,
-            headers={"Location": f"{frontend_url}/chatbot"}
-        )
+        return {"message": "Session established successfully."}
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Google login failed: {str(e)}"
+            detail="Something went wrong. Please try again."
         )
