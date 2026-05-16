@@ -560,58 +560,51 @@ def get_current_user(request: Request):
 GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
 GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
 GOOGLE_REDIRECT_URI = "https://Mozaicteck-mozaicteck-rag.hf.space/auth/google/callback"
+GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
 
 @router.get("/google/login")
 def google_login():
-    flow = Flow.from_client_config(
-        {
-            "web": {
-                "client_id": GOOGLE_CLIENT_ID,
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [GOOGLE_REDIRECT_URI]
-            }
-        },
-        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
-    )
-    flow.redirect_uri = GOOGLE_REDIRECT_URI
-    authorization_url, state = flow.authorization_url(
-        prompt="consent",
-        access_type="offline"
-    )
-    return {"url": authorization_url}
+    import urllib.parse
+    params = {
+        "client_id": GOOGLE_CLIENT_ID,
+        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid email profile",
+        "access_type": "offline",
+        "prompt": "consent"
+    }
+    auth_url = GOOGLE_AUTH_URL + "?" + urllib.parse.urlencode(params)
+    return {"url": auth_url}
+
 
 @router.get("/google/callback")
 def google_callback(code: str, response: Response):
     try:
-        flow = Flow.from_client_config(
-            {
-                "web": {
-                    "client_id": GOOGLE_CLIENT_ID,
-                    "client_secret": GOOGLE_CLIENT_SECRET,
-                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "redirect_uris": [GOOGLE_REDIRECT_URI]
-                }
-            },
-            scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
-        )
-        flow.redirect_uri = GOOGLE_REDIRECT_URI
-
-        import os as _os
-        _os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-
-        flow.fetch_token(
-            code=code,
-            include_client_id=True
-        )
-
-        credentials = flow.credentials
         import requests as req
+
+        token_response = req.post(
+            GOOGLE_TOKEN_URL,
+            data={
+                "code": code,
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "redirect_uri": GOOGLE_REDIRECT_URI,
+                "grant_type": "authorization_code"
+            }
+        )
+
+        token_data = token_response.json()
+
+        if "error" in token_data:
+            raise Exception(token_data["error"])
+
+        access_token = token_data.get("access_token")
+
         user_info = req.get(
-            "https://www.googleapis.com/oauth2/v2/userinfo",
-            headers={"Authorization": f"Bearer {credentials.token}"}
+            GOOGLE_USERINFO_URL,
+            headers={"Authorization": f"Bearer {access_token}"}
         ).json()
 
         email = user_info.get("email")
@@ -647,12 +640,12 @@ def google_callback(code: str, response: Response):
                 )
             user_id = str(user["_id"])
 
-        access_token = create_access_token(user_id)
-        refresh_token = create_refresh_token(user_id)
+        jwt_access_token = create_access_token(user_id)
+        jwt_refresh_token = create_refresh_token(user_id)
 
         response.set_cookie(
             key="access_token",
-            value=access_token,
+            value=jwt_access_token,
             httponly=True,
             samesite="none",
             secure=True,
@@ -660,7 +653,7 @@ def google_callback(code: str, response: Response):
         )
         response.set_cookie(
             key="refresh_token",
-            value=refresh_token,
+            value=jwt_refresh_token,
             httponly=True,
             samesite="lax",
             secure=True,
