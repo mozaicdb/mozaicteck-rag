@@ -2,6 +2,7 @@ import os
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from datetime import datetime, timedelta
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Response, Request
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
@@ -752,3 +753,60 @@ def google_session(gt: str, response: Response):
             status_code=500,
             detail="Something went wrong. Please try again."
         )
+    # Pydantic model for the update request body
+# All fields are Optional so user can update just one field if they want
+class UpdateProfileRequest(BaseModel):
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+    phoneNumber: Optional[str] = None
+    bio: Optional[str] = None
+
+@router.patch("/update-profile")
+async def update_profile(
+    request: Request,
+    body: UpdateProfileRequest
+):
+    # Step 1: Get the access token from cookies
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Step 2: Verify the token and extract the user ID
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    # Step 3: Build the update dictionary with only fields that were sent
+    # We skip any field that is None (meaning user didn't send it)
+    update_data = {}
+    if body.firstName is not None:
+        update_data["firstName"] = body.firstName
+    if body.lastName is not None:
+        update_data["lastName"] = body.lastName
+    if body.phoneNumber is not None:
+        update_data["phoneNumber"] = body.phoneNumber
+    if body.bio is not None:
+        update_data["bio"] = body.bio
+
+    # Step 4: If nothing was sent, return early
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided to update")
+
+    # Step 5: Update only the changed fields in MongoDB using $set
+    result = users_collection.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": update_data}
+    )
+
+    # Step 6: If nothing was changed, return an error instead of fake success
+    if result.modified_count == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Update failed. No changes were made."
+        )
+
+    return {"message": "Profile updated successfully"}
