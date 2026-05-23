@@ -810,3 +810,62 @@ async def update_profile(
         )
 
     return {"message": "Profile updated successfully"}
+
+    # Pydantic model for the password change request body
+class ChangePasswordRequest(BaseModel):
+    currentPassword: str
+    newPassword: str
+
+@router.patch("/change-password")
+async def change_password(
+    request: Request,
+    body: ChangePasswordRequest
+):
+    # Step 1: Get the access token from cookies
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Step 2: Verify the token and extract the user ID
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+    # Step 2b: Block same password change
+    if body.currentPassword == body.newPassword:
+        raise HTTPException(
+            status_code=400,
+            detail="New password must be different from current password"
+        )
+
+    # Step 3: Find the user in MongoDB
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Step 4: Block Google users from changing password
+    if user.get("authProvider", "local") == "google":
+        raise HTTPException(
+            status_code=400,
+            detail="Google accounts cannot change password here"
+        )
+
+    # Step 5: Verify the current password is correct
+    if not pwd_context.verify(body.currentPassword, user["passwordHash"]):
+        raise HTTPException(
+            status_code=400,
+            detail="Current password is incorrect"
+        )
+
+    # Step 6: Hash the new password and save it
+    new_hashed_password = pwd_context.hash(body.newPassword)
+    users_collection.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": {"passwordHash": new_hashed_password}}
+    )
+
+    return {"message": "Password changed successfully"}
