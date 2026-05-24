@@ -1,7 +1,7 @@
 import os
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Response, Request
 from pydantic import BaseModel, EmailStr
@@ -13,7 +13,6 @@ import secrets
 import re
 
 # -------------------- DATABASE CONNECTION --------------------
-# Connects to MongoDB Atlas using the URI stored in environment variables
 mongo_uri = os.environ["MONGO_URI"]
 mongo_client = MongoClient(mongo_uri)
 db = mongo_client["mozaic_db"]
@@ -23,18 +22,15 @@ two_fa_tokens_collection = db["two_fa_tokens"]
 google_session_tokens_collection = db["google_session_tokens"]
 
 # -------------------- PASSWORD HASHING SETUP --------------------
-# bcrypt is used to hash and verify passwords securely
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # -------------------- JWT SETUP --------------------
-# JWT is used to create and verify access and refresh tokens
 SECRET_KEY = os.environ["JWT_SECRET"]
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 # -------------------- ROUTER SETUP --------------------
-# All auth endpoints are grouped under the /auth prefix
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 # -------------------- HELPER FUNCTIONS --------------------
@@ -58,12 +54,12 @@ def validate_password(password: str):
         raise HTTPException(status_code=400, detail="Password must contain at least one special character")
 
 def create_access_token(user_id: str) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": user_id, "exp": expire, "type": "access"}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 def create_refresh_token(user_id: str) -> str:
-    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     payload = {"sub": user_id, "exp": expire, "type": "refresh"}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -89,8 +85,6 @@ class RegisterRequest(BaseModel):
     password: str
 
 # -------------------- REGISTER ENDPOINT --------------------
-# Creates a new user account, hashes their password,
-# saves to MongoDB, and sends a verification email via Brevo
 
 @router.post("/register")
 def register(body: RegisterRequest, response: Response):
@@ -119,7 +113,9 @@ def register(body: RegisterRequest, response: Response):
             "failedLoginAttempts": 0,
             "lockUntil": None,
             "authProvider": "local",
-            "createdAt": datetime.utcnow()
+            "createdAt": datetime.now(timezone.utc),
+            "plan": "free",
+            "planUpdatedAt": datetime.now(timezone.utc)
         }
 
         result = users_collection.insert_one(new_user)
@@ -130,7 +126,7 @@ def register(body: RegisterRequest, response: Response):
         verification_tokens_collection.insert_one({
             "userId": user_id,
             "token": verification_token,
-            "expiresAt": datetime.utcnow() + timedelta(hours=24),
+            "expiresAt": datetime.now(timezone.utc) + timedelta(hours=24),
             "used": False
         })
 
@@ -167,8 +163,6 @@ def register(body: RegisterRequest, response: Response):
         )
 
 # -------------------- VERIFY EMAIL ENDPOINT --------------------
-# Validates the token from the verification email link
-# and marks the user as verified in MongoDB
 
 @router.get("/verify-email")
 def verify_email(token: str):
@@ -187,7 +181,7 @@ def verify_email(token: str):
                 detail="This verification link has already been used. Please login."
             )
 
-        if datetime.utcnow() > token_record["expiresAt"]:
+        if datetime.now(timezone.utc).replace(tzinfo=None) > token_record["expiresAt"].replace(tzinfo=None):
             raise HTTPException(
                 status_code=400,
                 detail="This verification link has expired. Please register again."
@@ -222,9 +216,6 @@ class LoginRequest(BaseModel):
     password: str
 
 # -------------------- LOGIN ENDPOINT --------------------
-# Validates email and password, checks for account lock,
-# verifies email, blocks Google accounts from password login,
-# and sets access and refresh token cookies on success
 
 @router.post("/login")
 def login(body: LoginRequest, response: Response):
@@ -236,8 +227,8 @@ def login(body: LoginRequest, response: Response):
                 detail="Invalid email or password."
             )
 
-        if user.get("lockUntil") and datetime.utcnow() < user["lockUntil"]:
-            remaining = int((user["lockUntil"] - datetime.utcnow()).total_seconds())
+        if user.get("lockUntil") and datetime.now(timezone.utc).replace(tzinfo=None) < user["lockUntil"].replace(tzinfo=None):
+            remaining = int((user["lockUntil"].replace(tzinfo=None) - datetime.now(timezone.utc).replace(tzinfo=None)).total_seconds())
             raise HTTPException(
                 status_code=429,
                 detail=f"Account temporarily locked. Please try again in {remaining} seconds."
@@ -263,7 +254,7 @@ def login(body: LoginRequest, response: Response):
                     {"email": body.email},
                     {"$set": {
                         "failedLoginAttempts": failed_attempts,
-                        "lockUntil": datetime.utcnow() + timedelta(seconds=60)
+                        "lockUntil": datetime.now(timezone.utc) + timedelta(seconds=60)
                     }}
                 )
                 raise HTTPException(
@@ -327,8 +318,6 @@ def login(body: LoginRequest, response: Response):
         )
 
 # -------------------- LOGOUT ENDPOINT --------------------
-# Deletes the access and refresh token cookies from the browser
-# samesite must match exactly how the cookies were originally set
 
 @router.post("/logout")
 def logout(response: Response):
@@ -360,8 +349,6 @@ def logout(response: Response):
         )
 
 # -------------------- REFRESH TOKEN ENDPOINT --------------------
-# Uses the refresh token cookie to issue a new access token
-# when the current access token has expired
 
 @router.post("/refresh")
 def refresh_token(request: Request, response: Response):
@@ -411,8 +398,6 @@ class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
 # -------------------- FORGOT PASSWORD ENDPOINT --------------------
-# Sends a password reset link to the user's email via Brevo
-# The link expires in 15 minutes
 
 @router.post("/forgot-password")
 def forgot_password(body: ForgotPasswordRequest):
@@ -426,7 +411,7 @@ def forgot_password(body: ForgotPasswordRequest):
                 "userId": str(user["_id"]),
                 "token": reset_token,
                 "type": "password_reset",
-                "expiresAt": datetime.utcnow() + timedelta(minutes=15),
+                "expiresAt": datetime.now(timezone.utc) + timedelta(minutes=15),
                 "used": False
             })
 
@@ -472,8 +457,6 @@ class ResetPasswordRequest(BaseModel):
     new_password: str
 
 # -------------------- RESET PASSWORD ENDPOINT --------------------
-# Validates the reset token, checks expiry and usage,
-# hashes and saves the new password, resets failed login attempts
 
 @router.post("/reset-password")
 def reset_password(body: ResetPasswordRequest):
@@ -495,7 +478,7 @@ def reset_password(body: ResetPasswordRequest):
                 detail="This reset link has already been used. Please request a new one."
             )
 
-        if datetime.utcnow() > token_record["expiresAt"]:
+        if datetime.now(timezone.utc).replace(tzinfo=None) > token_record["expiresAt"].replace(tzinfo=None):
             raise HTTPException(
                 status_code=400,
                 detail="This reset link has expired. Please request a new one."
@@ -532,8 +515,6 @@ def reset_password(body: ResetPasswordRequest):
         )
 
 # -------------------- GET CURRENT USER ENDPOINT --------------------
-# Reads the access token cookie, verifies it,
-# and returns the logged in user's data from MongoDB
 
 @router.get("/me")
 def get_current_user(request: Request):
@@ -565,6 +546,9 @@ def get_current_user(request: Request):
                 "isEmailVerified": user["isEmailVerified"],
                 "isTwoFAEnabled": user["isTwoFAEnabled"],
                 "authProvider": user.get("authProvider", "local"),
+                "plan": user.get("plan", "free"),
+                "planUpdatedAt": str(user.get("planUpdatedAt", "")),
+                "planExpiresAt": str(user.get("planExpiresAt", "")),
                 "createdAt": str(user["createdAt"])
             }
         }
@@ -578,8 +562,6 @@ def get_current_user(request: Request):
         )
 
 # -------------------- GOOGLE OAUTH VARIABLES --------------------
-# These credentials come from Google Cloud Console
-# and are stored securely in environment variables
 
 GOOGLE_CLIENT_ID = os.environ["GOOGLE_CLIENT_ID"]
 GOOGLE_CLIENT_SECRET = os.environ["GOOGLE_CLIENT_SECRET"]
@@ -589,8 +571,6 @@ GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
 
 # -------------------- GOOGLE LOGIN ENDPOINT --------------------
-# Builds the Google OAuth URL with required parameters
-# and returns it to the frontend which redirects the user there
 
 @router.get("/google/login")
 def google_login():
@@ -606,12 +586,7 @@ def google_login():
     auth_url = GOOGLE_AUTH_URL + "?" + urllib.parse.urlencode(params)
     return {"url": auth_url}
 
-
 # -------------------- GOOGLE CALLBACK ENDPOINT --------------------
-# Called automatically by Google after the user approves login.
-# Exchanges the code from Google for user info, creates or finds the user,
-# generates a short-lived one-time token and redirects to the frontend with it.
-# The token is used to set cookies safely across domains.
 
 @router.get("/google/callback")
 def google_callback(code: str):
@@ -661,7 +636,9 @@ def google_callback(code: str):
                 "failedLoginAttempts": 0,
                 "lockUntil": None,
                 "authProvider": "google",
-                "createdAt": datetime.utcnow()
+                "createdAt": datetime.now(timezone.utc),
+                "plan": "free",
+                "planUpdatedAt": datetime.now(timezone.utc)
             }
             result = users_collection.insert_one(new_user)
             user_id = str(result.inserted_id)
@@ -679,7 +656,7 @@ def google_callback(code: str):
         google_session_tokens_collection.insert_one({
             "token": gt,
             "userId": user_id,
-            "expiresAt": datetime.utcnow() + timedelta(minutes=5),
+            "expiresAt": datetime.now(timezone.utc) + timedelta(minutes=5),
             "used": False
         })
 
@@ -695,13 +672,7 @@ def google_callback(code: str):
             detail=f"Google login failed: {str(e)}"
         )
 
-
 # -------------------- GOOGLE SESSION ENDPOINT --------------------
-# Called by the frontend after Google redirects back with a token in the URL.
-# This endpoint verifies the one-time token, marks it as used,
-# then sets the access and refresh cookies directly in the browser.
-# This solves the cross-domain cookie problem since cookies are set
-# via a direct frontend-to-backend call, not across a redirect.
 
 @router.get("/google/session")
 def google_session(gt: str, response: Response):
@@ -714,7 +685,7 @@ def google_session(gt: str, response: Response):
         if token_record["used"]:
             raise HTTPException(status_code=401, detail="Session token already used.")
 
-        if datetime.utcnow() > token_record["expiresAt"]:
+        if datetime.now(timezone.utc).replace(tzinfo=None) > token_record["expiresAt"].replace(tzinfo=None):
             raise HTTPException(status_code=401, detail="Session token expired.")
 
         google_session_tokens_collection.update_one(
@@ -753,8 +724,9 @@ def google_session(gt: str, response: Response):
             status_code=500,
             detail="Something went wrong. Please try again."
         )
-    # Pydantic model for the update request body
-# All fields are Optional so user can update just one field if they want
+
+# -------------------- UPDATE PROFILE ENDPOINT --------------------
+
 class UpdateProfileRequest(BaseModel):
     firstName: Optional[str] = None
     lastName: Optional[str] = None
@@ -766,12 +738,10 @@ async def update_profile(
     request: Request,
     body: UpdateProfileRequest
 ):
-    # Step 1: Get the access token from cookies
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    # Step 2: Verify the token and extract the user ID
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
@@ -780,8 +750,6 @@ async def update_profile(
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
-    # Step 3: Build the update dictionary with only fields that were sent
-    # We skip any field that is None (meaning user didn't send it)
     update_data = {}
     if body.firstName is not None:
         update_data["firstName"] = body.firstName
@@ -792,17 +760,14 @@ async def update_profile(
     if body.bio is not None:
         update_data["bio"] = body.bio
 
-    # Step 4: If nothing was sent, return early
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields provided to update")
 
-    # Step 5: Update only the changed fields in MongoDB using $set
     result = users_collection.update_one(
         {"_id": ObjectId(user_id)},
         {"$set": update_data}
     )
 
-    # Step 6: If nothing was changed, return an error instead of fake success
     if result.modified_count == 0:
         raise HTTPException(
             status_code=400,
@@ -811,7 +776,8 @@ async def update_profile(
 
     return {"message": "Profile updated successfully"}
 
-    # Pydantic model for the password change request body
+# -------------------- CHANGE PASSWORD ENDPOINT --------------------
+
 class ChangePasswordRequest(BaseModel):
     currentPassword: str
     newPassword: str
@@ -821,12 +787,10 @@ async def change_password(
     request: Request,
     body: ChangePasswordRequest
 ):
-    # Step 1: Get the access token from cookies
     token = request.cookies.get("access_token")
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    # Step 2: Verify the token and extract the user ID
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
@@ -834,34 +798,29 @@ async def change_password(
             raise HTTPException(status_code=401, detail="Invalid token")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
-    
-    # Step 2b: Block same password change
+
     if body.currentPassword == body.newPassword:
         raise HTTPException(
             status_code=400,
             detail="New password must be different from current password"
         )
 
-    # Step 3: Find the user in MongoDB
     user = users_collection.find_one({"_id": ObjectId(user_id)})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Step 4: Block Google users from changing password
     if user.get("authProvider", "local") == "google":
         raise HTTPException(
             status_code=400,
             detail="Google accounts cannot change password here"
         )
 
-    # Step 5: Verify the current password is correct
     if not pwd_context.verify(body.currentPassword, user["passwordHash"]):
         raise HTTPException(
             status_code=400,
             detail="Current password is incorrect"
         )
 
-    # Step 6: Hash the new password and save it
     new_hashed_password = pwd_context.hash(body.newPassword)
     users_collection.update_one(
         {"_id": ObjectId(user_id)},
@@ -869,3 +828,36 @@ async def change_password(
     )
 
     return {"message": "Password changed successfully"}
+
+# -------------------- UPGRADE PLAN ENDPOINT --------------------
+
+@router.patch("/upgrade-plan")
+async def upgrade_plan(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    result = users_collection.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": {
+            "plan": "pro",
+            "planUpdatedAt": datetime.now(timezone.utc),
+            "planExpiresAt": datetime.now(timezone.utc) + timedelta(days=30)
+        }}
+    )
+
+    if result.modified_count == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Plan upgrade failed. You may already be on pro."
+        )
+
+    return {"message": "Plan upgraded to pro successfully"}
