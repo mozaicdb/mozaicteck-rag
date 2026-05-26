@@ -874,3 +874,23 @@ async def check_verification(email: str):
     
     # Return the verification status
     return {"isEmailVerified": user.get("isEmailVerified", False)}
+
+    # Endpoint to validate a reset token without resetting the password
+# Used by the Reset Password page to check token status on load
+@router.get("/validate-reset-token")
+async def validate_reset_token(token: str):
+    token_record = verification_tokens_collection.find_one({
+        "token": token,
+        "type": "password_reset"
+    })
+
+    if not token_record:
+        return {"valid": False, "reason": "Invalid reset link. Please request a new one."}
+
+    if token_record["used"]:
+        return {"valid": False, "reason": "This reset link has already been used. Please login with your new password."}
+
+    if datetime.now(timezone.utc).replace(tzinfo=None) > token_record["expiresAt"].replace(tzinfo=None):
+        return {"valid": False, "reason": "This reset link has expired. Please request a new one."}
+
+    return {"valid": True, "reason": ""}
