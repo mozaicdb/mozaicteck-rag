@@ -861,3 +861,16 @@ async def upgrade_plan(request: Request):
         )
 
     return {"message": "Plan upgraded to pro successfully"}
+
+# Endpoint to check if a user's email has been verified
+# Used by the login page to detect verification in another tab
+@router.get("/check-verification")
+async def check_verification(email: str):
+    # Find the user by email
+    user = users_collection.find_one({"email": email})
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Return the verification status
+    return {"isEmailVerified": user.get("isEmailVerified", False)}
