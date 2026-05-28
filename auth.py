@@ -12,6 +12,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 import secrets
 import re
+import httpx
 
 # -------------------- DATABASE CONNECTION --------------------
 mongo_uri = os.environ["MONGO_URI"]
@@ -27,12 +28,28 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # -------------------- JWT SETUP --------------------
 SECRET_KEY = os.environ["JWT_SECRET"]
+RECAPTCHA_SECRET_KEY = os.environ["RECAPTCHA_SECRET_KEY"]
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 # -------------------- ROUTER SETUP --------------------
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+# -------------------- RECAPTCHA VERIFICATION --------------------
+
+async def verify_recaptcha(token: str) -> bool:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                "secret": RECAPTCHA_SECRET_KEY,
+                "response": token
+            }
+        )
+        result = response.json()
+        return result.get("success", False)
+
+
 
 # -------------------- HELPER FUNCTIONS --------------------
 
@@ -84,13 +101,21 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     phoneNumber: str
     password: str
+    recaptchaToken: str
 
 # -------------------- REGISTER ENDPOINT --------------------
 
 @router.post("/register")
 @limiter.limit("3/minute")
-def register(request: Request, body: RegisterRequest, response: Response):
+async def register(request: Request, body: RegisterRequest, response: Response):
     try:
+        is_human = await verify_recaptcha(body.recaptchaToken)
+        if not is_human:
+            raise HTTPException(
+                status_code=400,
+                detail="reCAPTCHA verification failed. Please try again."
+            )
+
         validate_password(body.password)
 
         existing_user = users_collection.find_one({"email": body.email})
@@ -216,13 +241,21 @@ def verify_email(token: str):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+    recaptchaToken: str
 
 # -------------------- LOGIN ENDPOINT --------------------
 
 @router.post("/login")
 @limiter.limit("5/minute")
-def login(request: Request, body: LoginRequest, response: Response):
+async def login(request: Request, body: LoginRequest, response: Response):
     try:
+        is_human = await verify_recaptcha(body.recaptchaToken)
+        if not is_human:
+            raise HTTPException(
+                status_code=400,
+                detail="reCAPTCHA verification failed. Please try again."
+            )
+
         user = users_collection.find_one({"email": body.email})
         if not user:
             raise HTTPException(
