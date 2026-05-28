@@ -13,7 +13,10 @@ prompts_collection = db["prompts"]
 
 conversations_collection = db["conversations"]
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from limiter import limiter
 from auth import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -201,6 +204,8 @@ class ConversationMessage(BaseModel):
 
 # PART 4 — Open the restaurant doors!
 app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -247,7 +252,8 @@ def search_prompts(q: str):
     return {"prompts": results}
 
 @app.post("/ask")
-def ask(body: Question):
+@limiter.limit("20/minute")
+def ask(request: Request, body: Question):
     selected_prompt_title = None
     prompt_introduction_index = None
 

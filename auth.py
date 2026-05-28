@@ -4,6 +4,7 @@ from sib_api_v3_sdk.rest import ApiException
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Response, Request
+from limiter import limiter
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 from jose import JWTError, jwt
@@ -87,7 +88,8 @@ class RegisterRequest(BaseModel):
 # -------------------- REGISTER ENDPOINT --------------------
 
 @router.post("/register")
-def register(body: RegisterRequest, response: Response):
+@limiter.limit("3/minute")
+def register(request: Request, body: RegisterRequest, response: Response):
     try:
         validate_password(body.password)
 
@@ -218,7 +220,8 @@ class LoginRequest(BaseModel):
 # -------------------- LOGIN ENDPOINT --------------------
 
 @router.post("/login")
-def login(body: LoginRequest, response: Response):
+@limiter.limit("5/minute")
+def login(request: Request, body: LoginRequest, response: Response):
     try:
         user = users_collection.find_one({"email": body.email})
         if not user:
