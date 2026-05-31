@@ -635,7 +635,7 @@ def google_login():
 # -------------------- GOOGLE CALLBACK ENDPOINT --------------------
 
 @router.get("/google/callback")
-def google_callback(code: str):
+async def google_callback(code: str):
     try:
         import requests as req
 
@@ -688,6 +688,17 @@ def google_callback(code: str):
             }
             result = users_collection.insert_one(new_user)
             user_id = str(result.inserted_id)
+
+            try:
+                async with httpx.AsyncClient() as client:
+                    await client.post(
+                        "https://n8n-production-f91f7.up.railway.app/webhook/new-user-registration",
+                        json={"email": email},
+                        timeout=5.0
+                    )
+            except Exception:
+                pass
+
         else:
             auth_provider = user.get("authProvider", "local")
             if auth_provider == "local":
@@ -717,7 +728,6 @@ def google_callback(code: str):
             status_code=500,
             detail=f"Google login failed: {str(e)}"
         )
-
 # -------------------- GOOGLE SESSION ENDPOINT --------------------
 
 @router.get("/google/session")
