@@ -35,6 +35,7 @@ REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 # -------------------- ROUTER SETUP --------------------
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
 # -------------------- RECAPTCHA VERIFICATION --------------------
 
 async def verify_recaptcha(token: str) -> bool:
@@ -48,7 +49,6 @@ async def verify_recaptcha(token: str) -> bool:
         )
         result = response.json()
         return result.get("success", False)
-
 
 
 # -------------------- HELPER FUNCTIONS --------------------
@@ -147,6 +147,16 @@ async def register(request: Request, body: RegisterRequest, response: Response):
 
         result = users_collection.insert_one(new_user)
         user_id = str(result.inserted_id)
+
+        try:
+            async with httpx.AsyncClient() as client:
+                await client.post(
+                    "https://n8n-production-f91f7.up.railway.app/webhook/new-user-registration",
+                    json={"email": body.email},
+                    timeout=5.0
+                )
+        except Exception:
+            pass
 
         verification_token = secrets.token_urlsafe(32)
 
@@ -898,21 +908,19 @@ async def upgrade_plan(request: Request):
 
     return {"message": "Plan upgraded to pro successfully"}
 
-# Endpoint to check if a user's email has been verified
-# Used by the login page to detect verification in another tab
+# -------------------- CHECK VERIFICATION ENDPOINT --------------------
+
 @router.get("/check-verification")
 async def check_verification(email: str):
-    # Find the user by email
     user = users_collection.find_one({"email": email})
-    
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
-    # Return the verification status
+
     return {"isEmailVerified": user.get("isEmailVerified", False)}
 
-    # Endpoint to validate a reset token without resetting the password
-# Used by the Reset Password page to check token status on load
+# -------------------- VALIDATE RESET TOKEN ENDPOINT --------------------
+
 @router.get("/validate-reset-token")
 async def validate_reset_token(token: str):
     token_record = verification_tokens_collection.find_one({
