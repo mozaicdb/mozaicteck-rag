@@ -5,6 +5,7 @@ os.environ["SENTENCE_TRANSFORMERS_HOME"] = "/tmp/.cache"
 from dotenv import load_dotenv
 load_dotenv()
 from pymongo import MongoClient
+from agent import agent_app, AgentState
 
 mongo_uri = os.environ["MONGO_URI"]
 mongo_client = MongoClient(mongo_uri)
@@ -380,3 +381,43 @@ def get_conversation(session_id: str):
         return conversation
     except Exception as e:
         return {"status": "error", "detail": str(e)}
+    
+    # Agent question model - accepts just the user message
+class AgentQuestion(BaseModel):
+    user_message: str
+
+# New LangGraph powered endpoint - runs alongside existing /ask endpoint
+@app.post("/agent-ask")
+@limiter.limit("20/minute")
+def agent_ask(request: Request, body: AgentQuestion):
+    try:
+        # Run the full LangGraph agent with initial empty state
+        result = agent_app.invoke({
+            "user_message": body.user_message,
+            "category": "",
+            "reason": "",
+            "generated_prompt": "",
+            "rejection_message": "",
+            "clarification_question": "",
+            "retrieved_context": ""
+        })
+
+        # If agent generated a prompt return it with category and type
+        if result["generated_prompt"]:
+            return {"answer": result["generated_prompt"], "category": result["category"], "type": "prompt"}
+
+        # If agent needs clarification return the question
+        if result["clarification_question"]:
+            return {"answer": result["clarification_question"], "category": result["category"], "type": "clarification"}
+
+        # If agent rejected the input return the polite message
+        if result["rejection_message"]:
+            return {"answer": result["rejection_message"], "category": result["category"], "type": "rejection"}
+
+        # Fallback if nothing was returned
+        return {"answer": "I could not process your request. Please try again.", "type": "error"}
+
+    except Exception as e:
+        # Catch any unexpected errors and return clean message
+        return {"answer": "Something went wrong. Please try again.", "detail": str(e)}
+    
